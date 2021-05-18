@@ -17,9 +17,9 @@ public class RankPN extends JPanel {
     public RankPN(){
 
         try{
-            font = Font.createFont(Font.TRUETYPE_FONT, new File("CloisterBlack.ttf")).deriveFont(45f);
+            font = Font.createFont(Font.TRUETYPE_FONT, new File("./media/CloisterBlack.ttf")).deriveFont(45f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("CloisterBlack.ttf")));
+            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("./media/CloisterBlack.ttf")));
         }
         catch(IOException | FontFormatException e){
         }
@@ -28,7 +28,7 @@ public class RankPN extends JPanel {
         ImageIcon icon = new ImageIcon("./media/mainMenuBakground_1920_1080.jpg");
         backgroundImg = icon.getImage().getScaledInstance(framePrincipal.getWidth(),framePrincipal.getHeight(),Image.SCALE_SMOOTH);
 
-        ranks=Connect.getRanking("alumne","alumne");
+        ranks=Connect.getRanking("root1","root1");
 
         JPanel tit = new JPanel();
         tit.setLayout(new GridLayout(3,1));
@@ -45,7 +45,7 @@ public class RankPN extends JPanel {
         tit.add(title);
 
         JPanel ranking = new JPanel();
-        ranking.setLayout(new GridLayout(8,6));
+        ranking.setLayout(new GridLayout(0,6));
 
         int cont=0;
         String[] pos = {"1ST","2ND","3RD","4TH","5TH"};

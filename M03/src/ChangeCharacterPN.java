@@ -80,26 +80,25 @@ public class ChangeCharacterPN extends JPanel {
         confirm.setContentAreaFilled(false);
         confirm.setIcon(new ImageIcon(new ImageIcon("./media/continue.png").getImage().getScaledInstance(framePrincipal.getWidth()/7,framePrincipal.getHeight()/10,Image.SCALE_DEFAULT)));
         confirm.setSize(rigth.getIcon().getIconWidth(),rigth.getIcon().getIconHeight());
-
-
         confirm.setName(warrior.getName());
 
         confirm.addActionListener(
-
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
                         JButton buttonTMP = (JButton) actionEvent.getSource();
 
                         CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
-                        cl.show(framePrincipal.getCards(),"MainMenu");
+                        cl.show(framePrincipal.getCards(),"ChangeWeapon");
 
                         PlayPN playPanel= (PlayPN) framePrincipal.getCards().getComponents()[1];
                         MainMenuPN mainMenuPanel= (MainMenuPN) framePrincipal.getCards().getComponents()[0];
+                        Warrior warr=null;
                         for (Warrior warri: warriors.getWarriors()){
                             if (warri.getName().equalsIgnoreCase(buttonTMP.getName())){
 
                                 /* Set Warrior to player */
+                                warr=warri;
                                 playPanel.setPlayerWarrior(warri);
                                 playPanel.getCharacterImage().setIcon(new ImageIcon(new ImageIcon(playPanel.getPlayerWarrior().getBstandLoop()).getImage().getScaledInstance(framePrincipal.getWidth()-500,framePrincipal.getHeight()-300,Image.SCALE_DEFAULT)));
 
@@ -120,13 +119,27 @@ public class ChangeCharacterPN extends JPanel {
                             }
                         }
 
+                        int con =0;
+                        while (playPanel.getPlayerWarrior().getName().equalsIgnoreCase(playPanel.getEnemyWarrior().getName())){
+                            playPanel.setEnemyWarrior(playPanel.randomEnemy());
+                            System.out.println(con);
+                            System.out.println(playPanel.getEnemyWarrior().getName());
+                            con++;
+                        }
+
                         Main.musica("MainMenu");
 
-                        framePrincipal.getPlayPN().setPlayerUser(new User("Carlos",framePrincipal.getPlayPN().getPlayerWarrior()));
+                        framePrincipal.getPlayPN().getPlayerUser().setWarrior(warr);
                     }
                 }
 
         );
+
+        PlayPN playPanel= framePrincipal.getPlayPN();
+
+        playPanel.getPlayerUser().setName(framePrincipal.getUserName());
+
+
 
         int width = this.getWidth();
         int height = this.getHeight();
@@ -269,7 +282,6 @@ public class ChangeCharacterPN extends JPanel {
 
 
         this.addComponentListener(
-
                 new ComponentAdapter() {
                     @Override
                     public void componentResized(ComponentEvent e) {
@@ -277,7 +289,6 @@ public class ChangeCharacterPN extends JPanel {
                         gif.setIcon(icon);
                     }
                 }
-
         );
 
 

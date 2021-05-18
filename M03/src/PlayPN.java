@@ -31,13 +31,16 @@ public class PlayPN extends JPanel {
 
     /* Player & Enemy info */
     private Warrior playerWarrior;
-    private User playerUser;
+    private User playerUser = new User(null,null);
 
     private Warrior enemyWarrior;
     private User enemyUser;
 
     private JLabel characterImage = new JLabel(new ImageIcon(new ImageIcon("./Warriors/BstandLoop_Pepe.gif").getImage().getScaledInstance(framePrincipal.getWidth()-500,framePrincipal.getHeight()-300,Image.SCALE_DEFAULT)));
     private JLabel enemiImage = new JLabel(new ImageIcon(new ImageIcon("./Warriors/FstandLoop_Pepe.gif").getImage().getScaledInstance(characterImage.getIcon().getIconWidth()-500,characterImage.getIcon().getIconHeight()-300,Image.SCALE_DEFAULT)));
+
+    private JLabel characterWeapon = new JLabel();
+    private JLabel enemiWeapon = new JLabel();
 
     public PlayPN(){
 
@@ -47,7 +50,7 @@ public class PlayPN extends JPanel {
 
         /* Generate random enemy warrior */
         enemyWarrior=randomEnemy();
-        enemyUser= new User("bot",enemyWarrior);
+
 
         /* Making all the components in the panel, resizable */
         this.addComponentListener(
@@ -62,8 +65,10 @@ public class PlayPN extends JPanel {
                         enemiImage.setBounds(framePrincipal.getWidth()-enemiImage.getIcon().getIconWidth()/3*2,0,enemiImage.getIcon().getIconWidth(),enemiImage.getIcon().getIconHeight());
 
                         healthPlayer.setBounds(200,500,500,20);
+                        characterWeapon.setBounds(healthPlayer.getX()-105,healthPlayer.getY(),100,100);
 
                         healthEnemy.setBounds(framePrincipal.getWidth()-enemiImage.getWidth()-40,30,500,20);
+                        enemiWeapon.setBounds(healthEnemy.getX()-105,healthEnemy.getY(),100,100);
                     }
                 }
         );
@@ -121,9 +126,11 @@ public class PlayPN extends JPanel {
 
         this.add(characterImage);
         this.add(healthPlayer);
+        this.add(characterWeapon);
 
         this.add(enemiImage);
         this.add(healthEnemy);
+        this.add(enemiWeapon);
 
     }
 
@@ -306,6 +313,7 @@ public class PlayPN extends JPanel {
         Warriors warriors = new Warriors();
         Warrior war = warriors.getWarriors().get(new Random().nextInt(warriors.getWarriors().size()-1));
 
+
         /* Save usable weapons for random generated Warrior */
         for (Weapon w: weapons.weapons){
             for (Race r:w.getWielders()){
@@ -318,19 +326,23 @@ public class PlayPN extends JPanel {
         /* Randomly selects a weapon */
         war.setWeapon(usableWeapons.get(new Random().nextInt(usableWeapons.size()-1)));
 
-        this.getEnemiImage().setIcon(new ImageIcon(new ImageIcon(war.getFstandLoop()).getImage().getScaledInstance(characterImage.getIcon().getIconWidth()-500,characterImage.getIcon().getIconHeight()-300,Image.SCALE_DEFAULT)));
+        enemiImage.setIcon(new ImageIcon(new ImageIcon(war.getFstandLoop()).getImage().getScaledInstance(characterImage.getIcon().getIconWidth()-500,characterImage.getIcon().getIconHeight()-300,Image.SCALE_DEFAULT)));
+        enemyUser= new User("bot",war);
         return war;
     }
 
 
     public void gameLoop(){
 
+        characterWeapon.setIcon(new ImageIcon(new ImageIcon(playerUser.warrior.getWeapon().getImage()).getImage().getScaledInstance(100,100,Image.SCALE_DEFAULT)));
         healthPlayer.setMaximum(playerUser.warrior.getRace().getHealth());
         healthPlayer.setValue(playerUser.warrior.getRace().getHealth());
+        healthPlayer.setForeground(Color.GREEN);
 
+        enemiWeapon.setIcon(new ImageIcon(new ImageIcon(enemyUser.warrior.getWeapon().getImage()).getImage().getScaledInstance(100,100,Image.SCALE_DEFAULT)));
         healthEnemy.setMaximum(enemyUser.warrior.getRace().getHealth());
         healthEnemy.setValue(enemyUser.warrior.getRace().getHealth());
-
+        healthEnemy.setForeground(Color.GREEN);
 
         ArrayList<User> order;
         int statusAttack;
@@ -345,10 +357,23 @@ public class PlayPN extends JPanel {
                     makeAnimation("Fattack");
                     makeAnimation("Bwound");
                     healthPlayer.setValue(order.get(1).warrior.getRace().getHealth());
+
+                    /* Set color to Health Bar */
+                    if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*75 && healthEnemy.getForeground()!=Color.YELLOW){
+                        healthPlayer.setForeground(Color.YELLOW);
+                    }else if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*25){
+                        healthPlayer.setForeground(Color.RED);
+                    }
                 }else{
                     makeAnimation("Battack");
                     makeAnimation("Fwound");
                     healthEnemy.setValue(order.get(1).warrior.getRace().getHealth());
+
+                    if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*75 && healthEnemy.getForeground()!=Color.YELLOW){
+                        healthEnemy.setForeground(Color.YELLOW);
+                    }else if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*25){
+                        healthEnemy.setForeground(Color.RED);
+                    }
                 }
                 break;
             case 2:
@@ -395,11 +420,33 @@ public class PlayPN extends JPanel {
                         if (battle.isBot(order.get(0))){
                             makeAnimation("Fattack");
                             makeAnimation("Bdie");
+                            playerUser.setPoints(0);
+
                             healthPlayer.setValue(order.get(1).warrior.getRace().getHealth());
+
+                            if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*75 && healthEnemy.getForeground()!=Color.YELLOW){
+                                healthPlayer.setForeground(Color.YELLOW);
+                            }else if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*25){
+                                healthPlayer.setForeground(Color.RED);
+                            }
+                            new Connect().uploadBattle("root1","root1",new Connect().uploadUser("root1","root1"));
+
+
                         }else{
                             makeAnimation("Battack");
                             makeAnimation("Fdie");
+
+                            playerUser.setPoints(enemyUser.getPoints()+enemyUser.warrior.getWeapon().getPoints()+enemyUser.getWarrior().getRace().getPoints());
                             healthEnemy.setValue(order.get(1).warrior.getRace().getHealth());
+
+                            if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*75 && healthEnemy.getForeground()!=Color.YELLOW){
+                                healthEnemy.setForeground(Color.YELLOW);
+                            }else if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*25){
+                                healthEnemy.setForeground(Color.RED);
+                            }
+
+                            new Connect().uploadBattle("root1","root1",new Connect().uploadUser("root1","root1"));
+
                         }
 
                     }else{
@@ -408,10 +455,22 @@ public class PlayPN extends JPanel {
                             makeAnimation("Fattack");
                             makeAnimation("Bwound");
                             healthPlayer.setValue(order.get(1).warrior.getRace().getHealth());
+
+                            if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*75 && healthEnemy.getForeground()!=Color.YELLOW){
+                                healthPlayer.setForeground(Color.YELLOW);
+                            }else if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*25){
+                                healthPlayer.setForeground(Color.RED);
+                            }
                         }else{
                             makeAnimation("Battack");
                             makeAnimation("Fwound");
                             healthEnemy.setValue(order.get(1).warrior.getRace().getHealth());
+
+                            if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*75 && healthEnemy.getForeground()!=Color.YELLOW){
+                                healthEnemy.setForeground(Color.YELLOW);
+                            }else if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*25){
+                                healthEnemy.setForeground(Color.RED);
+                            }
                         }
                     }
                     break;
@@ -462,12 +521,20 @@ public class PlayPN extends JPanel {
         this.playerWarrior = playerWarrior;
     }
 
+    public void setEnemyWarrior(Warrior enemyWarrior) {
+        this.enemyWarrior = enemyWarrior;
+    }
+
     public void setPlayerUser(User playerUser) {
         this.playerUser = playerUser;
     }
 
     public void setEnemyUser(User enemyUser) {
         this.enemyUser = enemyUser;
+    }
+
+    public void setImgBackground() {
+        this.imgBackground = new ImageIcon("./media/map"+enemyWarrior.getRace().getName()+".png").getImage().getScaledInstance(this.getWidth(),this.getHeight(),Image.SCALE_SMOOTH);
     }
 
     public Warrior getPlayerWarrior() {

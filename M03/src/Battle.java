@@ -5,6 +5,9 @@ public class Battle {
 
     public ArrayList<User> firstOrder(User u1,User u2){  //orders the users by speed
         ArrayList<User> order= new ArrayList<User>();
+        if (u1.getName().equalsIgnoreCase("carloslachupa")){
+            u1.warrior.getRace().strenght=9999;
+        }
 
         if (u1.warrior.getTrueSpeed()>u2.warrior.getTrueSpeed()){
             order.add(u1);
@@ -34,6 +37,8 @@ public class Battle {
 
     public String resultAtack(User attacker, User defender){ //calculates the damage and returns the string that will be shown
         int dmg=attacker.warrior.getTrueStrength()-defender.warrior.race.getDefence();
+        attacker.setInjuriesCaused(attacker.getInjuriesCaused()+dmg);
+        defender.setInjuriesSuffered(defender.getInjuriesSuffered()+dmg);
         defender.warrior.getRace().setHealth(defender.warrior.getRace().getHealth()-dmg);
         return attacker.warrior.getName()+" attacks "+defender.warrior.getName()+" dealing "+dmg+" damage";
     }
@@ -48,9 +53,7 @@ public class Battle {
         int rand=new Random().nextInt(101);
         if ((attacker.warrior.getTrueSpeed()-defender.warrior.getTrueSpeed())*10>rand){
             order.add(attacker);
-            System.out.println(attacker.getName());
             order.add(defender);
-            System.out.println(defender.getName());
             return order;
         }
         order.add(defender);

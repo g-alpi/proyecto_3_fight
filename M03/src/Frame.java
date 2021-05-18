@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Locale;
 
 public class Frame extends JFrame {
 
@@ -9,16 +10,18 @@ public class Frame extends JFrame {
 
     private JPanel cards = new JPanel(new CardLayout());
     private MainMenuPN mainMenuPanel= new MainMenuPN();
-    private PlayPN playPN = new PlayPN();
-    private ChangeCharacterPN changeCharacter= new ChangeCharacterPN();
+    private PlayPN playPN= new PlayPN();
+    private ChangeCharacterPN changeCharacter;
     private ChangeWeaponPN changeWeapon= new ChangeWeaponPN();
     private OptionsPN options= new OptionsPN();
     private RankPN rankPN=new RankPN();
+    private String player_id;
 
     public void newRankPN(){
+        cards.remove(rankPN);
         rankPN=new RankPN();
+        cards.add(rankPN,"Ranking");
     }
-
 
     public Frame() {
 
@@ -35,6 +38,9 @@ public class Frame extends JFrame {
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+
+
+        changeCharacter= new ChangeCharacterPN();
         cards.add(mainMenuPanel,"MainMenu");
         cards.add(playPN,"PeleaPanel");
         cards.add(changeCharacter,"ChangeCharacter");
@@ -77,5 +83,14 @@ public class Frame extends JFrame {
 
     public PlayPN getPlayPN() {
         return playPN;
+    }
+
+    public String getUserName() {
+
+        UIManager UI=new UIManager();
+        UI.put("OptionPane.background",Color.black );
+        UI.put("OptionPane.messageForeground", Color.white);
+        UI.put("Panel.background", Color.black);
+        return JOptionPane.showInputDialog(rootPane,"What's your name?","EnterName",JOptionPane.QUESTION_MESSAGE).toUpperCase(Locale.ROOT);
     }
 }

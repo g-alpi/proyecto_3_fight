@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class Warriors {
     ArrayList<Warrior> warriors = new ArrayList<Warrior>();
     public Warriors(){
-        Connect.downloadWarriors(this,"alumne","alumne");
+        Connect.downloadWarriors(this,"root1","root1");
         /*
         Race race = new Race();
         warriors.add(new Warrior("Pepe",race.getHuman(),null,"./warriors/portrait_Pepe.png","./warriors/FstandLoop_Pepe.gif","./warriors/BstandLoop_Pepe.gif","./warriors/Fattack_Pepe.gif","./warriors/Battack_Pepe.gif","./warriors/Fattack_bow_Pepe.gif","./warriors/Battack_bow_Pepe.gif","./warriors/Fdie_Pepe.gif","./warriors/Bdie_Pepe.gif","./warriors/Fwound_Pepe.gif","./warriors/Bwound_Pepe.gif","./warriors/Fdodge_Pepe.gif","./warriors/Bdodge_Pepe.gif","./warriors/dance_Pepe.gif","./warriors/cry_Pepe.gif"));

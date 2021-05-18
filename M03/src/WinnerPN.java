@@ -36,7 +36,7 @@ public class WinnerPN extends JPanel {
         User player=framePrincipal.getPlayPN().getPlayerUser();
         User enemy=framePrincipal.getPlayPN().getEnemyUser();
 
-        if (player.warrior.race.getHealth()==0){
+        if (player.warrior.race.getHealth()<=0){
             winner=enemy;
             loser=player;
         } else{
@@ -86,7 +86,7 @@ public class WinnerPN extends JPanel {
 
         JPanel buttons = new JPanel();
 
-        JButton goAgain = new JButton("go Again");
+        JButton goAgain = new JButton("Go Again");
         JButton rank=new JButton("Ranking");
 
         buttons.add(goAgain);
@@ -117,10 +117,11 @@ public class WinnerPN extends JPanel {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        framePrincipal.newRankPN();
                         PlayPN playPanel= (PlayPN) framePrincipal.getCards().getComponents()[1];
                         /* Change panel to figth */
                         CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
-                        cl.show(framePrincipal.getCards(), "RankPN");
+                        cl.show(framePrincipal.getCards(), "Ranking");
                     }
                 }
         );

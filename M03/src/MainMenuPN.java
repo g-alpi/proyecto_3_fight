@@ -155,6 +155,7 @@ public class MainMenuPN extends JPanel {
                             System.out.println("Tienes que escojer un personaje antes");
                         }else {
                             /* Change panel to figth */
+                            playPanel.setImgBackground();
                             CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                             cl.show(framePrincipal.getCards(), "PeleaPanel");
                         }
@@ -216,6 +217,7 @@ public class MainMenuPN extends JPanel {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
+                        framePrincipal.newRankPN();
                         CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                         cl.show(framePrincipal.getCards(),"Ranking");
                     }

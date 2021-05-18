@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class Weapons {
     ArrayList<Weapon> weapons = new ArrayList<Weapon>();
     public Weapons(){
-        Connect.downloadWeapons(this,"alumne","alumne");
+        Connect.downloadWeapons(this,"root1","root1");
 
         /*
         Race race=new Race();

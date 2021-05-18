@@ -69,7 +69,7 @@ public class ChangeWeaponPN extends JPanel {
         weapon=weapons.weapons.get(8);
 
         icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage().getScaledInstance((int) (framePrincipal.getWidth()/1.5f),(int) (framePrincipal.getHeight()/1.5f),Image.SCALE_DEFAULT));
-
+        System.out.println(weapon.getName());
         JButton rigth=new JButton();
         JButton left=new JButton();
 
@@ -123,7 +123,10 @@ public class ChangeWeaponPN extends JPanel {
 
         gif = new JLabel(icon);
         gifP.setSize((int) (gif.getIcon().getIconWidth()/1.5),gif.getIcon().getIconHeight());
+        gifP.setLayout(new BorderLayout());
+        gifP.add(new JLabel());
         gifP.add(gif);
+        gif.add(new JLabel());
 
         gif_info.setLayout(new GridLayout(0,4));
 
@@ -210,7 +213,7 @@ public class ChangeWeaponPN extends JPanel {
                 new ComponentAdapter() {
                     @Override
                     public void componentResized(ComponentEvent e) {
-                        icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage().getScaledInstance((int) (framePrincipal.getWidth()/1.5f),(int) (framePrincipal.getHeight()/1.5f),Image.SCALE_DEFAULT));
+                        icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage());
                         gif.setIcon(icon);
                     }
                 }
@@ -221,6 +224,7 @@ public class ChangeWeaponPN extends JPanel {
         gifP.setOpaque(false);
         gif_info.setOpaque(false);
         war.setOpaque(false);
+
         stats.setOpaque(false);
         info.setOpaque(false);
         info_.setOpaque(false);
@@ -236,7 +240,7 @@ public class ChangeWeaponPN extends JPanel {
         weapon=usableWeapons.get(num);
         text2.setText(weapon.getName());
 
-        icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage().getScaledInstance((int) (framePrincipal.getWidth()/1.5f),(int) (framePrincipal.getHeight()/1.5f),Image.SCALE_DEFAULT));
+        icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage());
 
         gif.setIcon(icon);
         gifP.setSize((int) (gif.getIcon().getIconWidth()/1.5),gif.getIcon().getIconHeight());
@@ -270,8 +274,7 @@ public class ChangeWeaponPN extends JPanel {
         weapon=weapons.weapons.get(8);
         text2.setText(weapon.getName());
 
-        icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage().getScaledInstance((int) (framePrincipal.getWidth()/1.5f),(int) (framePrincipal.getHeight()/1.5f),Image.SCALE_DEFAULT));
-
+        icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage());
         gif.setIcon(icon);
         gifP.setSize((int) (gif.getIcon().getIconWidth()/1.5),gif.getIcon().getIconHeight());
         confirm.setName(weapon.getName());
