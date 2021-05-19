@@ -1,9 +1,12 @@
 import java.util.ArrayList;
 
 public class Weapons {
+    Frame framePrincipal = (Frame) Frame.getFrames()[0];
     ArrayList<Weapon> weapons = new ArrayList<Weapon>();
+
+    Connect conection = framePrincipal.getMySqlCon();
     public Weapons(){
-        Connect.downloadWeapons(this,"root1","root1");
+        conection.downloadWeapons(this);
 
         /*
         Race race=new Race();

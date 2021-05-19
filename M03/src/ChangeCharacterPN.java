@@ -119,12 +119,8 @@ public class ChangeCharacterPN extends JPanel {
                             }
                         }
 
-                        int con =0;
                         while (playPanel.getPlayerWarrior().getName().equalsIgnoreCase(playPanel.getEnemyWarrior().getName())){
                             playPanel.setEnemyWarrior(playPanel.randomEnemy());
-                            System.out.println(con);
-                            System.out.println(playPanel.getEnemyWarrior().getName());
-                            con++;
                         }
 
                         Main.musica("MainMenu");
@@ -138,8 +134,6 @@ public class ChangeCharacterPN extends JPanel {
         PlayPN playPanel= framePrincipal.getPlayPN();
 
         playPanel.getPlayerUser().setName(framePrincipal.getUserName());
-
-
 
         int width = this.getWidth();
         int height = this.getHeight();

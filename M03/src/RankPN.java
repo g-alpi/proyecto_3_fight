@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RankPN extends JPanel {
+    Frame framePrincipal = (Frame) Frame.getFrames()[0];
     ArrayList ranks;
     Image backgroundImg;
     Font font;
@@ -28,7 +29,7 @@ public class RankPN extends JPanel {
         ImageIcon icon = new ImageIcon("./media/mainMenuBakground_1920_1080.jpg");
         backgroundImg = icon.getImage().getScaledInstance(framePrincipal.getWidth(),framePrincipal.getHeight(),Image.SCALE_SMOOTH);
 
-        ranks=Connect.getRanking("root1","root1");
+        ranks=framePrincipal.getMySqlCon().getRanking();
 
         JPanel tit = new JPanel();
         tit.setLayout(new GridLayout(3,1));

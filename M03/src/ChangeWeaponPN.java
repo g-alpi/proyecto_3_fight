@@ -69,7 +69,6 @@ public class ChangeWeaponPN extends JPanel {
         weapon=weapons.weapons.get(8);
 
         icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage().getScaledInstance((int) (framePrincipal.getWidth()/1.5f),(int) (framePrincipal.getHeight()/1.5f),Image.SCALE_DEFAULT));
-        System.out.println(weapon.getName());
         JButton rigth=new JButton();
         JButton left=new JButton();
 

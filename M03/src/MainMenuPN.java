@@ -23,7 +23,7 @@ public class MainMenuPN extends JPanel {
 
     private JButton rankingBT = new JButton(new ImageIcon("./media/button_ranking.png"));
 
-    private JButton options = new JButton();
+    private JButton exitBT = new JButton(new ImageIcon("./media/button_exit.png"));
 
 
 
@@ -36,6 +36,7 @@ public class MainMenuPN extends JPanel {
 
 
     public MainMenuPN(){
+        framePrincipal.setMySqlCon(new Connect());
         this.setLayout(null);
 
         MainMenuPN menuPanel = this;
@@ -67,8 +68,8 @@ public class MainMenuPN extends JPanel {
                         rankingBT.setIcon(rankingBT.getIcon());
                         rankingBT.setBounds(framePrincipal.getWidth()/2+500-changeCharacterBT.getIcon().getIconWidth()/2, framePrincipal.getHeight()/2+50,rankingBT.getIcon().getIconWidth(),rankingBT.getIcon().getIconHeight());
 
-
-
+                        exitBT.setIcon(exitBT.getIcon());
+                        exitBT.setBounds(10,10,exitBT.getIcon().getIconWidth(),exitBT.getIcon().getIconHeight());
 
 
 
@@ -136,6 +137,19 @@ public class MainMenuPN extends JPanel {
                 }
         );
 
+        exitBT.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        exitBT.setIcon(new ImageIcon("./media/button_exit-hover.png"));
+                    }
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        exitBT.setIcon(new ImageIcon("./media/button_exit.png"));
+                    }
+                }
+        );
+
         /* Init of all components */
         mainMenuLB.setBounds(framePrincipal.getWidth()/2-imgMenu.getIconWidth()/2,50,630,350);
         mainMenuLB.setOpaque(false);
@@ -159,6 +173,8 @@ public class MainMenuPN extends JPanel {
                             CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                             cl.show(framePrincipal.getCards(), "PeleaPanel");
                         }
+
+                        playPanel.setHealthBars();
 
                         /* Set music for new panel */
                         Main.musica("ChangeCharacter");
@@ -225,22 +241,18 @@ public class MainMenuPN extends JPanel {
         );
         this.add(rankingBT);
 
-
-        /*
-        options.setBorder(null);
-        options.setContentAreaFilled(false);
-        // Adding function to change to Options panel
-        options.addActionListener(
+        exitBT.setBorder(null);
+        exitBT.setContentAreaFilled(false);
+        exitBT.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
-                        cl.show(framePrincipal.getCards(),"Options");
+                        System.exit(0);
                     }
                 }
         );
-        this.add(options);
-        */
+        this.add(exitBT);
+
 
         /* Adding Characters and Weapong preview */
         this.add(characterIMG);

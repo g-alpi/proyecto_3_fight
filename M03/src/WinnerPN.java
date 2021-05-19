@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -86,8 +88,8 @@ public class WinnerPN extends JPanel {
 
         JPanel buttons = new JPanel();
 
-        JButton goAgain = new JButton("Go Again");
-        JButton rank=new JButton("Ranking");
+        JButton goAgain = new JButton();
+        JButton rank=new JButton();
 
         buttons.add(goAgain);
         buttons.add(rank);
@@ -99,20 +101,87 @@ public class WinnerPN extends JPanel {
 
         warriors.setOpaque(false);
 
+
+
+        goAgain.setIcon(new ImageIcon("./media/button_replay.png"));
+        goAgain.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        goAgain.setIcon(new ImageIcon("./media/button_replay-hover.png"));
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        goAgain.setIcon(new ImageIcon("./media/button_replay.png"));
+                    }
+                }
+        );
+
+        goAgain.setBorder(null);
+        goAgain.setContentAreaFilled(false);
         goAgain.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        PlayPN playPanel= (PlayPN) framePrincipal.getCards().getComponents()[1];
+                        PlayPN playPanel= framePrincipal.getPlayPN();
                         /* Change panel to figth */
                         CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                         cl.show(framePrincipal.getCards(), "PeleaPanel");
+
+
+                        /* Reset enemy warrior */
+                        playPanel.setEnemyWarrior(playPanel.randomEnemy());
+                        while (playPanel.getPlayerWarrior().getName().equalsIgnoreCase(playPanel.getEnemyWarrior().getName())){
+                            playPanel.setEnemyWarrior(playPanel.randomEnemy());
+                        }
+
+                        /* Reset health bars */
+                        playPanel.setHealthBars();
+
+                        /* Clean the console */
+                        playPanel.getConsole().setText("");
+
+                        /* Reset player health */
+                        switch (playPanel.getPlayerUser().warrior.getRace().getName()){
+                            case "Humano":
+                                playPanel.getPlayerUser().warrior.getRace();
+                                break;
+                            case "Dwarf":
+
+                                break;
+                            case "Elf":
+
+                                break;
+
+                        }
 
                         /* Set music for new panel */
                         Main.musica("ChangeCharacter");
                     }
                 }
         );
+
+
+
+        rank.setIcon(new ImageIcon("./media/button_ranking.png"));
+
+        rank.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        rank.setIcon(new ImageIcon("./media/button_ranking-hover.png"));
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        rank.setIcon(new ImageIcon("./media/button_ranking.png"));
+                    }
+                }
+        );
+
+        rank.setBorder(null);
+        rank.setContentAreaFilled(false);
         rank.addActionListener(
                 new ActionListener() {
                     @Override
@@ -125,7 +194,6 @@ public class WinnerPN extends JPanel {
                     }
                 }
         );
-
         this.setVisible(true);
     }
     @Override

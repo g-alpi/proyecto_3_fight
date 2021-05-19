@@ -27,7 +27,6 @@ public class PlayPN extends JPanel {
     private JProgressBar healthPlayer = new JProgressBar();
     private JProgressBar healthEnemy = new JProgressBar();
     private JButton boton = new JButton("Empezar pelea"); //Boton Temporal
-    private JButton boyon = new JButton("atras"); //Boton Temporal
 
     /* Player & Enemy info */
     private Warrior playerWarrior;
@@ -42,6 +41,8 @@ public class PlayPN extends JPanel {
     private JLabel characterWeapon = new JLabel();
     private JLabel enemiWeapon = new JLabel();
 
+    private Thread gameThread=null;
+
     public PlayPN(){
 
         /* Making a variable this, to use it later in action liseners */
@@ -50,7 +51,6 @@ public class PlayPN extends JPanel {
 
         /* Generate random enemy warrior */
         enemyWarrior=randomEnemy();
-
 
         /* Making all the components in the panel, resizable */
         this.addComponentListener(
@@ -99,30 +99,18 @@ public class PlayPN extends JPanel {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new Thread(){
-
+                        gameThread = new Thread(){
                             @Override
                             public void run() {
                                 gameLoop();
                             }
-                        }.start();
+                        };
+                        gameThread.start();
+
                     }
                 }
         );
         this.add(boton);
-
-        // Boton Temporal
-        boyon.setBounds(400,100,100,100);
-        boyon.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
-                        cl.show(framePrincipal.getCards(),"MainMenu");
-                    }
-                }
-        );
-        this.add(boyon);
 
         this.add(characterImage);
         this.add(healthPlayer);
@@ -288,9 +276,9 @@ public class PlayPN extends JPanel {
                         e.printStackTrace();
                     }
                 }
+
                 /* Loggin things from TextField to TextArea */
                 console.setText("\n"+text+console.getText());
-
 
                 /* Cleaning the TextField  after 1 second of displaying it */
                 try {
@@ -377,7 +365,7 @@ public class PlayPN extends JPanel {
                 }
                 break;
             case 2:
-                logText(order.get(0).getName()+" miss");
+                logText(order.get(0).warrior.getName()+" misses");
                 if (battle.isBot(order.get(0))){
                     makeAnimation("Fattack");
                 }else{
@@ -385,7 +373,7 @@ public class PlayPN extends JPanel {
                 }
                 break;
             case 3:
-                logText(order.get(1).getName()+" dodges "+order.get(0).getName()+"'s attack");
+                logText(order.get(1).warrior.getName()+" dodges "+order.get(0).warrior.getName()+"'s attack");
                 if (battle.isBot(order.get(0))){
                     makeAnimation("Fattack");
                     makeAnimation("Bdodge");
@@ -411,12 +399,14 @@ public class PlayPN extends JPanel {
                 case 1:
                     logText(battle.resultAtack(order.get(0),order.get(1)));
                     if (order.get(1).warrior.getRace().getHealth()<=0){
+
                         try {
-                            Thread.sleep(1000);
+                            gameThread.sleep(3000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        logText(order.get(1).warrior.getName()+" a muerto :(");
+
+                        logText(order.get(1).warrior.getName()+" died :(");
                         if (battle.isBot(order.get(0))){
                             makeAnimation("Fattack");
                             makeAnimation("Bdie");
@@ -429,7 +419,6 @@ public class PlayPN extends JPanel {
                             }else if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*25){
                                 healthPlayer.setForeground(Color.RED);
                             }
-                            new Connect().uploadBattle("root1","root1",new Connect().uploadUser("root1","root1"));
 
 
                         }else{
@@ -445,7 +434,6 @@ public class PlayPN extends JPanel {
                                 healthEnemy.setForeground(Color.RED);
                             }
 
-                            new Connect().uploadBattle("root1","root1",new Connect().uploadUser("root1","root1"));
 
                         }
 
@@ -475,7 +463,7 @@ public class PlayPN extends JPanel {
                     }
                     break;
                 case 2:
-                    logText(order.get(0).getName()+" miss");
+                    logText(order.get(0).warrior.getName()+" misses");
                     if (battle.isBot(order.get(0))){
                         makeAnimation("Fattack");
                     }else{
@@ -483,7 +471,7 @@ public class PlayPN extends JPanel {
                     }
                     break;
                 case 3:
-                    logText(order.get(1).getName()+" dodges "+order.get(1).getName()+"'s attack");
+                    logText(order.get(1).warrior.getName()+" dodges "+order.get(1).warrior.getName()+"'s attack");
                     if (battle.isBot(order.get(0))){
                         makeAnimation("Fattack");
                         makeAnimation("Bdodge");
@@ -502,11 +490,31 @@ public class PlayPN extends JPanel {
 
         }while(playerUser.warrior.getRace().getHealth()>0 && enemyUser.warrior.getRace().getHealth()>0);
 
+        framePrincipal.getMySqlCon().uploadBattle(framePrincipal.getMySqlCon().uploadUser());
+
         /* Displays Winner panel */
         framePrincipal.getCards().add(new WinnerPN(),"Winner");
         CardLayout cl = (CardLayout) framePrincipal.getCards().getLayout();
         cl.show(framePrincipal.getCards(),"Winner");
 
+    }
+
+    public void setHealthBars(){
+
+        characterWeapon.setIcon(new ImageIcon(new ImageIcon(playerUser.warrior.getWeapon().getImage()).getImage().getScaledInstance(100,100,Image.SCALE_DEFAULT)));
+        healthPlayer.setMaximum(playerUser.warrior.getRace().getHealth());
+        healthPlayer.setValue(playerUser.warrior.getRace().getHealth());
+        healthPlayer.setForeground(Color.GREEN);
+
+        enemiWeapon.setIcon(new ImageIcon(new ImageIcon(enemyUser.warrior.getWeapon().getImage()).getImage().getScaledInstance(100,100,Image.SCALE_DEFAULT)));
+        healthEnemy.setMaximum(enemyUser.warrior.getRace().getHealth());
+        healthEnemy.setValue(enemyUser.warrior.getRace().getHealth());
+        healthEnemy.setForeground(Color.GREEN);
+
+    }
+
+    public JTextArea getConsole() {
+        return console;
     }
 
     public User getPlayerUser() {

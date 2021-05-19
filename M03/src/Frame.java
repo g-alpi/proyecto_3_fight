@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class Frame extends JFrame {
@@ -8,14 +9,22 @@ public class Frame extends JFrame {
     private int height=1080;
 
 
-    private JPanel cards = new JPanel(new CardLayout());
-    private MainMenuPN mainMenuPanel= new MainMenuPN();
-    private PlayPN playPN= new PlayPN();
+    private JPanel cards;
+    private MainMenuPN mainMenuPanel;
+    private PlayPN playPN;
     private ChangeCharacterPN changeCharacter;
-    private ChangeWeaponPN changeWeapon= new ChangeWeaponPN();
-    private OptionsPN options= new OptionsPN();
-    private RankPN rankPN=new RankPN();
+    private ChangeWeaponPN changeWeapon;
+    private RankPN rankPN;
     private String player_id;
+    private static Connect mySqlCon;
+
+    public static void setMySqlCon(Connect mySqlCon) {
+        Frame.mySqlCon = mySqlCon;
+    }
+
+    public static Connect getMySqlCon() {
+        return mySqlCon;
+    }
 
     public void newRankPN(){
         cards.remove(rankPN);
@@ -24,7 +33,6 @@ public class Frame extends JFrame {
     }
 
     public Frame() {
-
         Main.musica("MainMenu");
 
         this.setSize(width,height);
@@ -39,15 +47,18 @@ public class Frame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
-
+        cards = new JPanel(new CardLayout());
+        mainMenuPanel= new MainMenuPN();
+        playPN= new PlayPN();
+        changeWeapon= new ChangeWeaponPN();
+        rankPN=new RankPN();
         changeCharacter= new ChangeCharacterPN();
+
         cards.add(mainMenuPanel,"MainMenu");
         cards.add(playPN,"PeleaPanel");
         cards.add(changeCharacter,"ChangeCharacter");
         cards.add(changeWeapon,"ChangeWeapon");
         cards.add(rankPN,"Ranking");
-        //cards.add(options,"Options");
-
 
 
         this.add(cards);
@@ -85,12 +96,25 @@ public class Frame extends JFrame {
         return playPN;
     }
 
-    public String getUserName() {
 
+
+    public String getUserName() {
         UIManager UI=new UIManager();
         UI.put("OptionPane.background",Color.black );
         UI.put("OptionPane.messageForeground", Color.white);
         UI.put("Panel.background", Color.black);
         return JOptionPane.showInputDialog(rootPane,"What's your name?","EnterName",JOptionPane.QUESTION_MESSAGE).toUpperCase(Locale.ROOT);
+    }
+    public ArrayList<String> getMysqlCredentials(){
+        ArrayList<String> credentials=new ArrayList<>();
+        UIManager UI=new UIManager();
+        UI.put("OptionPane.background", Color.black );
+        UI.put("OptionPane.messageForeground", Color.white);
+        UI.put("Panel.background", Color.BLUE);
+        String usr = JOptionPane.showInputDialog(rootPane,"Username","Mysql",JOptionPane.QUESTION_MESSAGE);
+        String pwd = JOptionPane.showInputDialog(rootPane,"Password","Mysql",JOptionPane.QUESTION_MESSAGE);
+        credentials.add(usr);
+        credentials.add(pwd);
+        return credentials;
     }
 }
