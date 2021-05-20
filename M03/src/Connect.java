@@ -37,21 +37,21 @@ public class Connect {
 
         framePrincipal.setUsername(cred.getUser());
         String tempUser = cred.getUser();
-        tempUser.replace("\""," ");     //controling the input chars
-        tempUser.replace("'"," ");
-        tempUser.replace("\\"," ");
-        tempUser.replace("="," ");
-        tempUser.replace("\""," ");
-        tempUser.replace(";"," ");
+        tempUser.replace("\"","a");     //controling the input chars
+        tempUser.replace("'","a");
+        tempUser.replace("\\","a");
+        tempUser.replace("=","a");
+        tempUser.replace("\"","a");
+        tempUser.replace(";","a");
         cred.setUser(tempUser);
         
         user=cred.getMySqlUser();
-        user.replace("\""," ");
-        user.replace("'"," ");
-        user.replace("\\"," ");
-        user.replace("="," ");
-        user.replace("\""," ");
-        user.replace(";"," ");
+        user.replace("\"","a");
+        user.replace("'","a");
+        user.replace("\\","a");
+        user.replace("=","a");
+        user.replace("\"","a");
+        user.replace(";","a");
         
         passwd=cred.getMySqlPwd();
         passwd.replace("\""," ");
@@ -107,6 +107,10 @@ public class Connect {
 
             return mostDmg;
 
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             System.out.println("Error");
         } catch (ClassNotFoundException e) {
@@ -142,6 +146,10 @@ public class Connect {
 
             return mostDmg;
 
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             System.out.println("Error");
         } catch (ClassNotFoundException e) {
@@ -175,6 +183,10 @@ public class Connect {
                     rank.add(campo);
                 }
             }
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -195,6 +207,10 @@ public class Connect {
             rs.next();
             human= new Race(rs.getString(1),rs.getInt(2),rs.getInt(3),rs.getInt(4),rs.getInt(5),rs.getInt(6),rs.getInt(7));
 
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -215,6 +231,10 @@ public class Connect {
             rs.next();
             elf= new Race(rs.getString(1),rs.getInt(2),rs.getInt(3),rs.getInt(4),rs.getInt(5),rs.getInt(6),rs.getInt(7));
 
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -235,6 +255,10 @@ public class Connect {
             rs.next();
             dwarf= new Race(rs.getString(1),rs.getInt(2),rs.getInt(3),rs.getInt(4),rs.getInt(5),rs.getInt(6),rs.getInt(7));
 
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -320,6 +344,10 @@ public class Connect {
                 }
             }
 
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             framePrincipal.setMySqlCon(new Connect());
         } catch (ClassNotFoundException e) {
@@ -369,6 +397,10 @@ public class Connect {
                 }
             }
 
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             framePrincipal.setMySqlCon(new Connect());
         } catch (ClassNotFoundException e) {
@@ -409,6 +441,10 @@ public class Connect {
             pstm.setInt(9,player.getPoints());
             pstm.executeUpdate();
 
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -441,6 +477,10 @@ public class Connect {
             Statement stm_rk = con.createStatement();
             stm_rk.executeUpdate("insert into ranking values(" + id + "," + player.getPoints() + ",\"" + player.getWarrior().getName() + "\")");
 
+        } catch (SQLSyntaxErrorException e) {
+            System.out.println("el username peta, no se añadira a la db");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("el username peta, no se añadira a la db");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
