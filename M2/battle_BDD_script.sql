@@ -95,9 +95,6 @@ values ('dagger',null,3,0,'human,elf',50),
 ('dirk',null,4,0,'human,elf,dwarf',12),
 ('two-handed ax',null,3,0,'human,elf',20);
 
-select * from race;
-select * from warriors;
-
 insert into warriors values('Pepe','./warriors/portrait_Pepe.png','human','./warriors/portrait_Pepe.gif','./warriors/FstandLoop_Pepe.gif',
 './warriors/BstandLoop_Pepe.gif','./warriors/Fattack_Pepe.gif','./warriors/Battack_Pepe.gif','./warriors/Fattack_bow_Pepe.gif','./warriors/Battack_bow_Pepe.gif',
 './warriors/Fdie_Pepe.gif','./warriors/Bdie_Pepe.gif','./warriors/Fwound_Pepe.gif','./warriors/Bwound_Pepe.gif','./warriors/Fdodge_Pepe.gif','./warriors/Bdodge_Pepe.gif',
