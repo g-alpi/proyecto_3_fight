@@ -1,4 +1,4 @@
-drop database battles;
+/*drop database battles;*/
 create database battles;
 use battles;
 create table weapons(
