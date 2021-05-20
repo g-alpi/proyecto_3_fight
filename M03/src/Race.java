@@ -1,4 +1,5 @@
 public class Race {
+    //declaring variables
     String name;
     int health;
     int strenght;

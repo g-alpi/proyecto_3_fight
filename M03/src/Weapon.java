@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 public class Weapon {
+    //declaring variables
     String name;
     int speedBonus;
     int strenghtBonus;

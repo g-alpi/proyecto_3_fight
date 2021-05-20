@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ConnectPN extends JFrame {
+    //declaring variables
     private String user;
     private String MySqlUser;
     private String MySqlPwd;
@@ -45,6 +46,7 @@ public class ConnectPN extends JFrame {
     }
 
     public ConnectPN(){
+        //setting attributes of the frame and adding components
         this.setSize(400,200);
         this.setTitle("LOGIN");
         this.setResizable(false);
@@ -86,6 +88,7 @@ public class ConnectPN extends JFrame {
         this.setVisible(true);
 
         ConnectPN Panel = this;
+        //making the confirm button do its purpose
         confirm.addActionListener(
                 new ActionListener() {
                     @Override

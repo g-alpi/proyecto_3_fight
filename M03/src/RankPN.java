@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RankPN extends JPanel {
+    //declaring variables
     Frame framePrincipal = (Frame) Frame.getFrames()[0];
     ArrayList ranks;
     Image backgroundImg;
@@ -17,7 +18,7 @@ public class RankPN extends JPanel {
     Font font;
 
     public RankPN(){
-
+        //importing a font
         try{
             font = Font.createFont(Font.TRUETYPE_FONT, new File("./media/CloisterBlack.ttf")).deriveFont(45f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -25,12 +26,13 @@ public class RankPN extends JPanel {
         }
         catch(IOException | FontFormatException e){
         }
-
+        //setting the backroundimg
         Frame framePrincipal = (Frame) Frame.getFrames()[0];
         ImageIcon icon = new ImageIcon("./media/backRank.png");
         backgroundImg = icon.getImage().getScaledInstance(framePrincipal.getWidth(),framePrincipal.getHeight(),Image.SCALE_SMOOTH);
 
-        ranks=framePrincipal.getMySqlCon().getRanking();
+        ranks=framePrincipal.getMySqlCon().getRanking(); //getting arrayLists with the rankings
+        //making components
 
         JPanel tit = new JPanel();
         tit.setLayout(new GridLayout(3,1));
@@ -50,7 +52,7 @@ public class RankPN extends JPanel {
 
         ranking.setLayout(new GridLayout(0,6));
 
-        int cont=0;
+        int cont=0; //adding the ranking to the panels
         String[] pos = {"1ST","2ND","3RD","4TH","5TH","6TH","7TH","8TH","9TH","10TH"};
         for (Object rank:ranks){
             rank= (ArrayList) rank;
@@ -84,13 +86,12 @@ public class RankPN extends JPanel {
         ranking.setOpaque(false);
         this.setLayout(new BorderLayout());
 
-
         JPanel tables = new JPanel();
         tables.setLayout(new BorderLayout());
-
+        //getting most damage dealt and recieved ever
         ArrayList dmgTaken = framePrincipal.getMySqlCon().getMostDmgTaken();
         ArrayList dmgDealt = framePrincipal.getMySqlCon().getMostDmgDealt();
-
+        //creating the components to show dmgTaken and dmgDealt
         JPanel damages = new JPanel();
         damages.setLayout(new GridLayout(0,2));
         JPanel damageTaken = new JPanel();
@@ -131,8 +132,7 @@ public class RankPN extends JPanel {
 
         damages.setOpaque(false);
         tables.setOpaque(false);
-
-        //tables.setOpaque(true);
+        //adding
         tables.add(tit,BorderLayout.NORTH);
         tables.add(ranking,BorderLayout.CENTER);
         tables.add(damages,BorderLayout.SOUTH);

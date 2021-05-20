@@ -10,12 +10,13 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class WinnerPN extends JPanel {
+    //declaring variables
     private User winner;
     private User loser;
     private Image backgroundImg;
     private Font font;
     public WinnerPN(){
-
+        //importing a font
         try{
             font = Font.createFont(Font.TRUETYPE_FONT, new File("./media/CloisterBlack.ttf")).deriveFont(70f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -26,19 +27,17 @@ public class WinnerPN extends JPanel {
 
 
         this.setLayout(new BorderLayout());
-
+        //getting the background img
         Frame framePrincipal = (Frame) Frame.getFrames()[0];
         ImageIcon icon = new ImageIcon("./media/WinnerBackground.jpg");
         backgroundImg = icon.getImage().getScaledInstance(framePrincipal.getWidth(),framePrincipal.getHeight(),Image.SCALE_SMOOTH);
 
         Warriors warri = new Warriors();
-        //User player=new User("juan",warri.warriors.get(1));
-        //User enemy=new User("juan",warri.warriors.get(2));
-        //enemy.warrior.race.setHealth(0);
+        //getting the player and its opponent
         User player=framePrincipal.getPlayPN().getPlayerUser();
         User enemy=framePrincipal.getPlayPN().getEnemyUser();
 
-        if (player.getWarrior().getRace().getHealth()<=0){
+        if (player.getWarrior().getRace().getHealth()<=0){ //checking who won
             winner=enemy;
             loser=player;
         } else{
@@ -48,7 +47,7 @@ public class WinnerPN extends JPanel {
 
         JPanel textPN = new JPanel();
         textPN.setLayout(new GridLayout(3,0));
-
+        //saying who won
         String wins = winner.getWarrior().getName()+" wins";
         wins=wins.toLowerCase(Locale.ROOT);
         JLabel text = new JLabel(wins);
@@ -71,7 +70,7 @@ public class WinnerPN extends JPanel {
         JPanel blank = new JPanel();
         blank.setOpaque(false);
         warriors.add(blank);
-
+        //showing the respective gifs
         ImageIcon winnerGif = new ImageIcon("./warriors/dance_"+winner.getWarrior().getName()+".gif");
         ImageIcon loserGif = new ImageIcon("./warriors/cry_"+loser.getWarrior().getName()+".gif");
 
@@ -94,7 +93,7 @@ public class WinnerPN extends JPanel {
         buttons.add(goAgain);
         buttons.add(rank);
         buttons.setOpaque(false);
-
+        //adding components
         this.add(text,BorderLayout.NORTH);
         this.add(warriors,BorderLayout.CENTER);
         this.add(buttons,BorderLayout.SOUTH);
@@ -104,6 +103,7 @@ public class WinnerPN extends JPanel {
 
 
         goAgain.setIcon(new ImageIcon("./media/button_replay.png"));
+        //making the icon change on hover
         goAgain.addMouseListener(
                 new MouseAdapter() {
                     @Override
@@ -120,6 +120,7 @@ public class WinnerPN extends JPanel {
 
         goAgain.setBorder(null);
         goAgain.setContentAreaFilled(false);
+        //adding functionality to the button
         goAgain.addActionListener(
                 new ActionListener() {
                     @Override
@@ -172,6 +173,7 @@ public class WinnerPN extends JPanel {
 
 
         rank.setIcon(new ImageIcon("./media/button_ranking.png"));
+        //making the icon change on hover
 
         rank.addMouseListener(
                 new MouseAdapter() {
@@ -189,6 +191,7 @@ public class WinnerPN extends JPanel {
 
         rank.setBorder(null);
         rank.setContentAreaFilled(false);
+        //adding functionality to the button
         rank.addActionListener(
                 new ActionListener() {
                     @Override
@@ -206,7 +209,7 @@ public class WinnerPN extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
+        //to show bacgroundImg as background
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(backgroundImg,0,0,this);
     }

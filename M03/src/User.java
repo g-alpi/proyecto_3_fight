@@ -1,9 +1,10 @@
 public class User {
-    protected String name;
-    protected Warrior warrior;
-    protected int points;
-    protected int injuriesCaused;
-    protected int injuriesSuffered;
+    //declaring variables
+    private String name;
+    private Warrior warrior;
+    private int points;
+    private int injuriesCaused;
+    private int injuriesSuffered;
 
     public int getInjuriesCaused() {
         return injuriesCaused;

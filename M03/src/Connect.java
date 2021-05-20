@@ -6,7 +6,8 @@ import java.util.Locale;
 import java.util.Scanner;
 
 public class Connect {
-    private static Frame framePrincipal= (Frame) Frame.getFrames()[0];
+    //declaring variables
+    private static Frame framePrincipal= (Frame) Frame.getFrames()[0]; //getting the principal frame so we can access the username
     private ArrayList<String> credentials;
     private static String user;
     private static String passwd;
@@ -28,14 +29,15 @@ public class Connect {
     }
 
     public Connect(){
+        //create the connect panel to make the user input his credentials
         ConnectPN cred = new ConnectPN();
         while (!cred.getConfirmed()){
-            System.out.print("");
+            System.out.print("");   //untill the user has inputed the credentials the program wont continue
         }
 
         framePrincipal.setUsername(cred.getUser());
         String tempUser = cred.getUser();
-        tempUser.replace("\""," ");
+        tempUser.replace("\""," ");     //controling the input chars
         tempUser.replace("'"," ");
         tempUser.replace("\\"," ");
         tempUser.replace("="," ");
@@ -62,7 +64,7 @@ public class Connect {
         if (tempUser.length()>7){
             JOptionPane.showMessageDialog(null, "Username can't be longer than 7", "Error", JOptionPane.ERROR_MESSAGE);
             new Connect();
-        }else {
+        }else {     //controling that the credentials are ok
             try {
                 Connection con = null;
                 Class.forName("com.mysql.cj.jdbc.Driver");
@@ -83,21 +85,18 @@ public class Connect {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
 
+            //checking if theres has been no battles yet
             Statement stm_p=con.createStatement();
-            ResultSet rs_p=stm_p.executeQuery("select count(*) from ranking");
+            ResultSet rs_p=stm_p.executeQuery("select count(*) from battle");
             rs_p.next();
             if (rs_p.getInt(1)==0){
                 mostDmg.add(" NULL ");
                 mostDmg.add("_");
                 return mostDmg;
             }
-
+            //select the values we want to show
             Statement stm=con.createStatement();
             ResultSet rs=null;
-
-            rs=stm.executeQuery("select player_id,max(injuries_caused) from battle");
-
-            rs.next();
 
             Statement stm_n=con.createStatement();
             ResultSet rs_n=stm_n.executeQuery("select players.player_name,battle.injuries_caused from battle Inner join players on players.player_id=battle.player_id where injuries_caused=(select max(injuries_caused) from battle) limit 1;");
@@ -122,22 +121,17 @@ public class Connect {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
             con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
-
+            //checking if theres has been no battles yet
             Statement stm_p=con.createStatement();
-            ResultSet rs_p=stm_p.executeQuery("select count(*) from ranking");
+            ResultSet rs_p=stm_p.executeQuery("select count(*) from battle");
             rs_p.next();
             if (rs_p.getInt(1)==0){
                 mostDmg.add(" NULL ");
-                mostDmg.add(0);
+                mostDmg.add("_");
                 return mostDmg;
             }
 
-            Statement stm=con.createStatement();
-            ResultSet rs=null;
-
-            rs=stm.executeQuery("select player_id,max(injuries_suffered) from battle");
-
-            rs.next();
+            //select the values we want to show
 
             Statement stm_n=con.createStatement();
             ResultSet rs_n=stm_n.executeQuery("select players.player_name,battle.injuries_suffered from battle Inner join players on players.player_id=battle.player_id where injuries_suffered=(select max(injuries_suffered) from battle) limit 1;");
@@ -165,10 +159,10 @@ public class Connect {
 
             Statement stm=con.createStatement();
             ResultSet rs=null;
-
+            //selecting the ranks ordered
             rs=stm.executeQuery("select * from ranking order by total_points DESC");
             ResultSetMetaData obj= rs.getMetaData();
-
+            //showing the first ten
             for (int i = 1; i < 11; ++i){
                 ArrayList<String> campo = new ArrayList();
                 if (rs.next()){
@@ -195,7 +189,7 @@ public class Connect {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
-
+            //getting every aspect of the race human so when we want to create one e can just call this function
             Statement stm = con.createStatement();
             ResultSet rs = stm.executeQuery("select * from race where race_name='human';");
             rs.next();
@@ -215,7 +209,7 @@ public class Connect {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
-
+            //getting every aspect of the race elf so when we want to create one e can just call this function
             Statement stm = con.createStatement();
             ResultSet rs = stm.executeQuery("select * from race where race_name='elf';");
             rs.next();
@@ -235,7 +229,7 @@ public class Connect {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
-
+            //getting every aspect of the race dwarf so when we want to create one e can just call this function
             Statement stm = con.createStatement();
             ResultSet rs = stm.executeQuery("select * from race where race_name='dwarf';");
             rs.next();
@@ -258,15 +252,10 @@ public class Connect {
             con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
             Statement stm=con.createStatement();
             ResultSet rs=null;
-
-            rs=stm.executeQuery("select * from weapons");
-
-            Race r = new Race();
-            Scanner s = new Scanner(System.in);
+            //selecting every warrior and creating a new warrior for each one
             rs=stm.executeQuery("select * from warriors");
             while (rs.next()){
 
-                Race race= new Race();
                 if (rs.getString(3).equalsIgnoreCase("human")){
                     w.getWarriors().add(new Human(rs.getString(1),getHuman(),
                             null,
@@ -345,11 +334,9 @@ public class Connect {
             con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
             Statement stm=con.createStatement();
             ResultSet rs=null;
-
+            //selecting every weapon and creating a new weapon for each one
             rs=stm.executeQuery("select * from weapons");
 
-            Race r = new Race();
-            Scanner s = new Scanner(System.in);
             while (rs.next()){
                 ArrayList<Race>raza= new ArrayList<>();
                 if (rs.getString(5).equalsIgnoreCase("human")){
@@ -390,6 +377,7 @@ public class Connect {
     }
 
     public void uploadBattle(int idP){
+        //getting the user and his enemy
         User player=framePrincipal.getPlayPN().getPlayerUser();
         User enemy=framePrincipal.getPlayPN().getEnemyUser();
 
@@ -399,7 +387,7 @@ public class Connect {
             con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
 
             int idB;
-
+            //checking the last id inserted
             Statement stm_idB=con.createStatement();
             ResultSet rs_idB=stm_idB.executeQuery("Select count(*),max(battle_id) from battle");
             rs_idB.next();
@@ -408,7 +396,7 @@ public class Connect {
             } else {
                 idB=rs_idB.getInt(2)+1;
             }
-
+            //inserting the values
             PreparedStatement pstm = con.prepareStatement("insert into battle values (?,?,?,?,?,?,?,?,?)");
             pstm.setInt(1,idB);
             pstm.setInt(2,idP);
@@ -435,9 +423,9 @@ public class Connect {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
-
+            //getting the user
             User player = framePrincipal.getPlayPN().getPlayerUser();
-
+            //checking the past id inserted
             Statement stm_id = con.createStatement();
             ResultSet rs_id = stm_id.executeQuery("select count(*),max(player_id) from players;");
             rs_id.next();
@@ -446,6 +434,7 @@ public class Connect {
             } else {
                 id = rs_id.getInt(2) + 1;
             }
+            //inserting the player in players and ranking
             Statement stm_pl = con.createStatement();
             stm_pl.executeUpdate("insert into players values(" + id + ",\"" + player.getName() + "\")");
 

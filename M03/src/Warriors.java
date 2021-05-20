@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 
 public class Warriors {
+    //declare variables
     private Frame framePrincipal = (Frame) Frame.getFrames()[0];
     private ArrayList<Warrior> warriors = new ArrayList<Warrior>();
 
@@ -10,7 +11,7 @@ public class Warriors {
 
     Connect conection=framePrincipal.getMySqlCon();
     public Warriors(){
-
+        //getting the warriors from the database
         conection.downloadWarriors(this);
 
     }

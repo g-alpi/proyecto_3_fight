@@ -4,9 +4,9 @@ import java.awt.event.*;
 import java.sql.SQLException;
 
 public class MainMenuPN extends JPanel {
-
+    //initializing variables
     Frame framePrincipal = (Frame) Frame.getFrames()[0];
-
+    //image for the background
     private ImageIcon iconMainMenuIC = new ImageIcon("./media/mainMenuBakground_"+framePrincipal.getWidth()+"_"+framePrincipal.getHeight()+".jpg");
     private Image imageMainMenuIMG = iconMainMenuIC.getImage();
 
@@ -27,7 +27,6 @@ public class MainMenuPN extends JPanel {
     private JButton exitBT = new JButton(new ImageIcon("./media/button_exit.png"));
 
 
-
     private JLabel characterIMG = new JLabel(new ImageIcon(new ImageIcon("./Warriors/portrait_def.png").getImage().getScaledInstance(70,70,Image.SCALE_SMOOTH)));
     private JLabel characterName = new JLabel("?????");
 
@@ -37,17 +36,14 @@ public class MainMenuPN extends JPanel {
 
 
     public MainMenuPN(){
-
+        //start the conexion with the database
         framePrincipal.setMySqlCon(new Connect());
-
-
-
 
         this.setLayout(null);
 
         MainMenuPN menuPanel = this;
-
         /* Ajust scale of things based on the resolution of the frame */
+
         this.addComponentListener(
 
                 new ComponentAdapter() {
@@ -89,7 +85,7 @@ public class MainMenuPN extends JPanel {
                     }
                 }
         );
-
+        //mouse listeners for changing the icon when hovering
         playMainMenuBT.addMouseListener(
                 new MouseAdapter() {
                     @Override
@@ -188,19 +184,19 @@ public class MainMenuPN extends JPanel {
                             playPanel.getConsole().setText("");
 
                             /* Reset player health */
-                            switch (playPanel.getPlayerUser().warrior.getRace().getName()){
+                            switch (playPanel.getPlayerUser().getWarrior().getRace().getName()){
                                 case "human":
-                                    playPanel.getPlayerUser().warrior.setRace(framePrincipal.getMySqlCon().getHuman());
+                                    playPanel.getPlayerUser().getWarrior().setRace(framePrincipal.getMySqlCon().getHuman());
                                     break;
                                 case "dwarf":
-                                    playPanel.getPlayerUser().warrior.setRace(framePrincipal.getMySqlCon().getDwarf());
+                                    playPanel.getPlayerUser().getWarrior().setRace(framePrincipal.getMySqlCon().getDwarf());
                                     break;
                                 case "elf":
-                                    playPanel.getPlayerUser().warrior.setRace(framePrincipal.getMySqlCon().getElf());
+                                    playPanel.getPlayerUser().getWarrior().setRace(framePrincipal.getMySqlCon().getElf());
                                     break;
                             }
 
-                            playPanel.getCharacterImage().setIcon(new ImageIcon(playPanel.getPlayerUser().warrior.getBstandLoop()));
+                            playPanel.getCharacterImage().setIcon(new ImageIcon(playPanel.getPlayerUser().getWarrior().getBstandLoop()));
 
 
                             /* Reset health bars */
@@ -267,6 +263,7 @@ public class MainMenuPN extends JPanel {
 
         rankingBT.setBorder(null);
         rankingBT.setContentAreaFilled(false);
+        //making the ranking button work
         rankingBT.addActionListener(
                 new ActionListener() {
                     @Override
@@ -282,6 +279,7 @@ public class MainMenuPN extends JPanel {
 
         exitBT.setBorder(null);
         exitBT.setContentAreaFilled(false);
+        //making the exit button work
         exitBT.addActionListener(
                 new ActionListener() {
                     @Override

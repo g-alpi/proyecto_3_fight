@@ -1,4 +1,5 @@
 public class Warrior {
+    //declaring variables
     private String name;
     private Race race;
     private Weapon weapon;
@@ -124,7 +125,7 @@ public class Warrior {
         this.dance = dance;
         this.cry = cry;
     }
-
+    //to get the speed and strenght of the warrior plus its weapon
     public int getTrueSpeed(){
         return this.race.getSpeed()+this.weapon.getSpeedBonus();
     }
