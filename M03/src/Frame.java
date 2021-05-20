@@ -5,9 +5,10 @@ import java.util.Locale;
 
 public class Frame extends JFrame {
 
-    private int width=1920;
-    private int height=1080;
+    private int width = 1920;
+    private int height = 1080;
 
+    private String username;
 
     private JPanel cards;
     private MainMenuPN mainMenuPanel;
@@ -18,6 +19,14 @@ public class Frame extends JFrame {
     private String player_id;
     private static Connect mySqlCon;
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public static void setMySqlCon(Connect mySqlCon) {
         Frame.mySqlCon = mySqlCon;
     }
@@ -26,16 +35,16 @@ public class Frame extends JFrame {
         return mySqlCon;
     }
 
-    public void newRankPN(){
+    public void newRankPN() {
         cards.remove(rankPN);
-        rankPN=new RankPN();
-        cards.add(rankPN,"Ranking");
+        rankPN = new RankPN();
+        cards.add(rankPN, "Ranking");
     }
 
     public Frame() {
         Main.musica("MainMenu");
 
-        this.setSize(width,height);
+        this.setSize(width, height);
 
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
@@ -48,18 +57,17 @@ public class Frame extends JFrame {
 
 
         cards = new JPanel(new CardLayout());
-        mainMenuPanel= new MainMenuPN();
-        playPN= new PlayPN();
-        changeWeapon= new ChangeWeaponPN();
-        rankPN=new RankPN();
-        changeCharacter= new ChangeCharacterPN();
+        mainMenuPanel = new MainMenuPN();
+        playPN = new PlayPN();
+        changeWeapon = new ChangeWeaponPN();
+        rankPN = new RankPN();
+        changeCharacter = new ChangeCharacterPN();
 
-        cards.add(mainMenuPanel,"MainMenu");
-        cards.add(playPN,"PeleaPanel");
-        cards.add(changeCharacter,"ChangeCharacter");
-        cards.add(changeWeapon,"ChangeWeapon");
-        cards.add(rankPN,"Ranking");
-
+        cards.add(mainMenuPanel, "MainMenu");
+        cards.add(playPN, "PeleaPanel");
+        cards.add(changeCharacter, "ChangeCharacter");
+        cards.add(changeWeapon, "ChangeWeapon");
+        cards.add(rankPN, "Ranking");
 
         this.add(cards);
 
@@ -94,27 +102,5 @@ public class Frame extends JFrame {
 
     public PlayPN getPlayPN() {
         return playPN;
-    }
-
-
-
-    public String getUserName() {
-        UIManager UI=new UIManager();
-        UI.put("OptionPane.background",Color.black );
-        UI.put("OptionPane.messageForeground", Color.white);
-        UI.put("Panel.background", Color.black);
-        return JOptionPane.showInputDialog(rootPane,"What's your name?","EnterName",JOptionPane.QUESTION_MESSAGE).toUpperCase(Locale.ROOT);
-    }
-    public ArrayList<String> getMysqlCredentials(){
-        ArrayList<String> credentials=new ArrayList<>();
-        UIManager UI=new UIManager();
-        UI.put("OptionPane.background", Color.black );
-        UI.put("OptionPane.messageForeground", Color.white);
-        UI.put("Panel.background", Color.BLUE);
-        String usr = JOptionPane.showInputDialog(rootPane,"Username","Mysql",JOptionPane.QUESTION_MESSAGE);
-        String pwd = JOptionPane.showInputDialog(rootPane,"Password","Mysql",JOptionPane.QUESTION_MESSAGE);
-        credentials.add(usr);
-        credentials.add(pwd);
-        return credentials;
     }
 }

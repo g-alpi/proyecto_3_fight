@@ -1,8 +1,13 @@
 import java.util.ArrayList;
 
 public class Warriors {
-    Frame framePrincipal = (Frame) Frame.getFrames()[0];
-    ArrayList<Warrior> warriors = new ArrayList<Warrior>();
+    private Frame framePrincipal = (Frame) Frame.getFrames()[0];
+    private ArrayList<Warrior> warriors = new ArrayList<Warrior>();
+
+    public void setWarriors(ArrayList<Warrior> warriors) {
+        this.warriors = warriors;
+    }
+
     Connect conection=framePrincipal.getMySqlCon();
     public Warriors(){
 

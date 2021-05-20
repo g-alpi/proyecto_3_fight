@@ -8,64 +8,69 @@ import java.util.ArrayList;
 
 
 public class ChangeCharacterPN extends JPanel {
-    Frame framePrincipal = (Frame) Frame.getFrames()[0];
 
-    ImageIcon img = new ImageIcon("./media/changeCharacterBackground.png");
-    Image imgI = img.getImage().getScaledInstance(framePrincipal.getWidth(),framePrincipal.getHeight(),Image.SCALE_SMOOTH);
+    //initializing variables
+    private Frame framePrincipal = (Frame) Frame.getFrames()[0];
 
-    int num=1;
-    Warriors warriors = new Warriors();
-    Warrior warrior;
-    JButton confirm=new JButton();
+    private ImageIcon img = new ImageIcon("./media/changeCharacterBackground.png");
+    private Image imgI = img.getImage().getScaledInstance(framePrincipal.getWidth(),framePrincipal.getHeight(),Image.SCALE_SMOOTH);
 
-    Icon icon;
-    JLabel gif;
+    private int num=1;
+    private Warriors warriors;
+    private Warrior warrior;
+    private JButton confirm=new JButton();
 
-    JPanel gifP = new JPanel();
+    private Icon icon;
+    private JLabel gif;
 
-    JPanel gif_info = new JPanel();
+    private JPanel gifP = new JPanel();
 
-    JPanel war = new JPanel();
-    JPanel stats = new JPanel();
+    private JPanel gif_info = new JPanel();
 
-    JPanel hp = new JPanel();
-    JProgressBar hpBar = new JProgressBar(0,60);
+    private JPanel war = new JPanel();
+    private JPanel stats = new JPanel();
 
-    JPanel str = new JPanel();
-    JProgressBar strBar = new JProgressBar(0,7);
+    private JPanel hp = new JPanel();
+    private JProgressBar hpBar = new JProgressBar(0,60);
 
-    JPanel df = new JPanel();
-    JProgressBar dfBar = new JProgressBar(0,7);
+    private JPanel str = new JPanel();
+    private JProgressBar strBar = new JProgressBar(0,7);
 
-    JPanel aglty = new JPanel();
-    JProgressBar agltyBar = new JProgressBar(0,7);
+    private JPanel df = new JPanel();
+    private JProgressBar dfBar = new JProgressBar(0,7);
 
-    JPanel spd = new JPanel();
-    JProgressBar spdBar = new JProgressBar(0,7);
+    private JPanel aglty = new JPanel();
+    private JProgressBar agltyBar = new JProgressBar(0,7);
 
-    JPanel info = new JPanel();
+    private JPanel spd = new JPanel();
+    private JProgressBar spdBar = new JProgressBar(0,7);
 
-    JPanel info_ = new JPanel();
+    private JPanel info = new JPanel();
 
-    JLabel text = new JLabel("RACE:");
+    private JPanel info_ = new JPanel();
 
-    JLabel text2;
+    private JLabel text = new JLabel("RACE:");
 
-    JLabel text3 = new JLabel(" ");
+    private JLabel text2;
 
-    JLabel text4 = new JLabel("NAME:");
+    private JLabel text3 = new JLabel(" ");
 
-    JLabel text5;
+    private JLabel text4 = new JLabel("NAME:");
+
+    private JLabel text5;
 
     public ChangeCharacterPN(){
 
+        /* Generates array of warriors */
+        warriors = new Warriors();
         this.setLayout(new BorderLayout());
-        warrior=warriors.warriors.get(num);
+        warrior=warriors.getWarriors().get(num);
         icon = new ImageIcon(new ImageIcon(warrior.getPortraitGif()).getImage().getScaledInstance((int) (framePrincipal.getWidth()/1.5f),(int) (framePrincipal.getHeight()/1.5f),Image.SCALE_DEFAULT));
 
         JButton rigth=new JButton();
         JButton left=new JButton();
 
+        /* Set Images to buttons */
         left.setBorder(null);
         left.setContentAreaFilled(false);
         left.setIcon(new ImageIcon(new ImageIcon("./media/arrowL.png").getImage().getScaledInstance(framePrincipal.getWidth()/10,framePrincipal.getHeight()/10,Image.SCALE_DEFAULT)));
@@ -108,7 +113,7 @@ public class ChangeCharacterPN extends JPanel {
                                 /* Gets the usable weapons for selected warrior */
                                 mainMenuPanel.setCharacterImage(warri);
                                 ChangeWeaponPN.usableWeapons = new ArrayList<Weapon>();
-                                for (Weapon w: ChangeWeaponPN.weapons.weapons){
+                                for (Weapon w: ChangeWeaponPN.weapons.getWeapons()){
                                     for (Race r:w.getWielders()){
                                         if (r.getName().equalsIgnoreCase(warri.getRace().getName())){
                                             ChangeWeaponPN.usableWeapons.add(w);
@@ -122,9 +127,6 @@ public class ChangeCharacterPN extends JPanel {
                         while (playPanel.getPlayerWarrior().getName().equalsIgnoreCase(playPanel.getEnemyWarrior().getName())){
                             playPanel.setEnemyWarrior(playPanel.randomEnemy());
                         }
-
-                        Main.musica("MainMenu");
-
                         framePrincipal.getPlayPN().getPlayerUser().setWarrior(warr);
                     }
                 }
@@ -133,12 +135,12 @@ public class ChangeCharacterPN extends JPanel {
 
         PlayPN playPanel= framePrincipal.getPlayPN();
 
-        playPanel.getPlayerUser().setName(framePrincipal.getUserName());
+        playPanel.getPlayerUser().setName(framePrincipal.getUsername());
 
         int width = this.getWidth();
         int height = this.getHeight();
 
-
+        /* Set First warrior to be show */
         gif = new JLabel(icon);
         gifP.setSize((int) (gif.getIcon().getIconWidth()/1.5),gif.getIcon().getIconHeight());
         gifP.add(gif);
@@ -192,7 +194,6 @@ public class ChangeCharacterPN extends JPanel {
         info.setLayout(null);
 
 
-
         info_.setLayout(new BoxLayout(info_, BoxLayout.Y_AXIS));
         text.setForeground(Color.WHITE);
         text.setFont(new Font("Agency FB",Font.BOLD, 30));
@@ -219,6 +220,7 @@ public class ChangeCharacterPN extends JPanel {
 
         this.setOpaque(false);
 
+        /* Set Background visible */
         info_.setOpaque(false);
         info.setOpaque(false);
         gifP.setOpaque(false);
@@ -249,6 +251,7 @@ public class ChangeCharacterPN extends JPanel {
         this.add(confirm,BorderLayout.SOUTH);
         this.add(war,BorderLayout.CENTER);
 
+        /* Add's functionality to buttons */
         rigth.addActionListener(
                 new ActionListener() {
                     @Override
@@ -288,17 +291,16 @@ public class ChangeCharacterPN extends JPanel {
 
     }
 
-    public void init(){
+    public void init(){  /* Updates the information and repaints the panel */
 
-        warrior=warriors.warriors.get(num);
+        warriors = new Warriors();
+
+        warrior=warriors.getWarriors().get(num);
         icon = new ImageIcon(new ImageIcon(warrior.getPortraitGif()).getImage().getScaledInstance((int) (framePrincipal.getWidth()/1.5f),(int) (framePrincipal.getHeight()/1.5f),Image.SCALE_DEFAULT));
 
         gif.setIcon(icon);
         gifP.setSize((int) (gif.getIcon().getIconWidth()/1.5),gif.getIcon().getIconHeight());
         confirm.setName(warrior.getName());
-
-
-
 
 
         gif_info.setLayout(new GridLayout(0,4));
@@ -351,6 +353,7 @@ public class ChangeCharacterPN extends JPanel {
 
     }
 
+    //to set the background
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -359,7 +362,5 @@ public class ChangeCharacterPN extends JPanel {
         g2d.drawImage(imgI,0,0,this);
 
     }
-
-
 
 }

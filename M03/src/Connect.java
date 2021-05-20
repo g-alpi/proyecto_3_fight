@@ -6,10 +6,10 @@ import java.util.Locale;
 import java.util.Scanner;
 
 public class Connect {
-    Frame framePrincipal = (Frame) Frame.getFrames()[0];
-    ArrayList<String> credentials;
-    static String user;
-    static String passwd;
+    private static Frame framePrincipal= (Frame) Frame.getFrames()[0];
+    private ArrayList<String> credentials;
+    private static String user;
+    private static String passwd;
 
     public static String getUser() {
         return user;
@@ -28,9 +28,132 @@ public class Connect {
     }
 
     public Connect(){
-        credentials=framePrincipal.getMysqlCredentials();
-        user=credentials.get(0);
-        passwd=credentials.get(1);
+        ConnectPN cred = new ConnectPN();
+        while (!cred.getConfirmed()){
+            System.out.print("");
+        }
+
+        framePrincipal.setUsername(cred.getUser());
+        String tempUser = cred.getUser();
+        tempUser.replace("\""," ");
+        tempUser.replace("'"," ");
+        tempUser.replace("\\"," ");
+        tempUser.replace("="," ");
+        tempUser.replace("\""," ");
+        tempUser.replace(";"," ");
+        cred.setUser(tempUser);
+        
+        user=cred.getMySqlUser();
+        user.replace("\""," ");
+        user.replace("'"," ");
+        user.replace("\\"," ");
+        user.replace("="," ");
+        user.replace("\""," ");
+        user.replace(";"," ");
+        
+        passwd=cred.getMySqlPwd();
+        passwd.replace("\""," ");
+        passwd.replace("'"," ");
+        passwd.replace("\\"," ");
+        passwd.replace("="," ");
+        passwd.replace("\""," ");
+        passwd.replace(";"," ");
+
+        if (tempUser.length()>7){
+            JOptionPane.showMessageDialog(null, "Username can't be longer than 7", "Error", JOptionPane.ERROR_MESSAGE);
+            new Connect();
+        }else {
+            try {
+                Connection con = null;
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
+            } catch (ClassNotFoundException | SQLException e) {
+                JOptionPane.showMessageDialog(null, "Wrong credentials", "Error", JOptionPane.ERROR_MESSAGE);
+                new Connect();
+            }
+        }
+
+    }
+
+    public static ArrayList getMostDmgDealt(){
+        ArrayList mostDmg=null;
+        try {
+            mostDmg=new ArrayList();
+            Connection con = null;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
+
+            Statement stm_p=con.createStatement();
+            ResultSet rs_p=stm_p.executeQuery("select count(*) from ranking");
+            rs_p.next();
+            if (rs_p.getInt(1)==0){
+                mostDmg.add(" NULL ");
+                mostDmg.add("_");
+                return mostDmg;
+            }
+
+            Statement stm=con.createStatement();
+            ResultSet rs=null;
+
+            rs=stm.executeQuery("select player_id,max(injuries_caused) from battle");
+
+            rs.next();
+
+            Statement stm_n=con.createStatement();
+            ResultSet rs_n=stm_n.executeQuery("select players.player_name,battle.injuries_caused from battle Inner join players on players.player_id=battle.player_id where injuries_caused=(select max(injuries_caused) from battle) limit 1;");
+            rs_n.next();
+
+            mostDmg.add(rs_n.getString(1));
+            mostDmg.add(rs_n.getInt(2));
+
+            return mostDmg;
+
+        } catch (SQLException throwables) {
+            System.out.println("Error");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return mostDmg;
+    }
+    public static ArrayList getMostDmgTaken(){
+        ArrayList mostDmg=null;
+        try {
+            mostDmg=new ArrayList();
+            Connection con = null;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
+
+            Statement stm_p=con.createStatement();
+            ResultSet rs_p=stm_p.executeQuery("select count(*) from ranking");
+            rs_p.next();
+            if (rs_p.getInt(1)==0){
+                mostDmg.add(" NULL ");
+                mostDmg.add(0);
+                return mostDmg;
+            }
+
+            Statement stm=con.createStatement();
+            ResultSet rs=null;
+
+            rs=stm.executeQuery("select player_id,max(injuries_suffered) from battle");
+
+            rs.next();
+
+            Statement stm_n=con.createStatement();
+            ResultSet rs_n=stm_n.executeQuery("select players.player_name,battle.injuries_suffered from battle Inner join players on players.player_id=battle.player_id where injuries_suffered=(select max(injuries_suffered) from battle) limit 1;");
+            rs_n.next();
+
+            mostDmg.add(rs_n.getString(1));
+            mostDmg.add(rs_n.getInt(2));
+
+            return mostDmg;
+
+        } catch (SQLException throwables) {
+            System.out.println("Error");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return mostDmg;
     }
 
     public static ArrayList<ArrayList> getRanking() {
@@ -46,7 +169,7 @@ public class Connect {
             rs=stm.executeQuery("select * from ranking order by total_points DESC");
             ResultSetMetaData obj= rs.getMetaData();
 
-            for (int i = 1; i < 6; ++i){
+            for (int i = 1; i < 11; ++i){
                 ArrayList<String> campo = new ArrayList();
                 if (rs.next()){
                     Statement stm2=con.createStatement();
@@ -145,7 +268,7 @@ public class Connect {
 
                 Race race= new Race();
                 if (rs.getString(3).equalsIgnoreCase("human")){
-                    w.warriors.add(new Human(rs.getString(1),getHuman(),
+                    w.getWarriors().add(new Human(rs.getString(1),getHuman(),
                             null,
                             rs.getString(2),
                             rs.getString(4),
@@ -165,7 +288,7 @@ public class Connect {
                             rs.getString(18)));
                 }
                 else if (rs.getString(3).equalsIgnoreCase("dwarf")){
-                    w.warriors.add(new Dwarf(
+                    w.getWarriors().add(new Dwarf(
                             rs.getString(1),
                             getDwarf(),
                             null,
@@ -187,7 +310,7 @@ public class Connect {
                             rs.getString(18)));
                 }
                 else if (rs.getString(3).equalsIgnoreCase("elf")){
-                    w.warriors.add(new Elf(rs.getString(1),getElf(),
+                    w.getWarriors().add(new Elf(rs.getString(1),getElf(),
                             null,
                             rs.getString(2),
                             rs.getString(4),
@@ -209,7 +332,7 @@ public class Connect {
             }
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            framePrincipal.setMySqlCon(new Connect());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -231,36 +354,36 @@ public class Connect {
                 ArrayList<Race>raza= new ArrayList<>();
                 if (rs.getString(5).equalsIgnoreCase("human")){
                     raza.add(getHuman());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("dwarf")){
                     raza.add(getDwarf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("elf")){
                     raza.add(getElf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("human,elf")){
                     raza.add(getHuman());
                     raza.add(getElf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("human,dwarf")){
                     raza.add(getHuman());
                     raza.add(getDwarf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("human,elf,dwarf")){
                     raza.add(getHuman());
                     raza.add(getElf());
                     raza.add(getDwarf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
             }
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            framePrincipal.setMySqlCon(new Connect());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

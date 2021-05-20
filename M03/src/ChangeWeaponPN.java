@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 
 public class ChangeWeaponPN extends JPanel {
+
+    //initializing variables
     Frame framePrincipal = (Frame) Frame.getFrames()[0];
 
     ImageIcon img = new ImageIcon("./media/changeCharacterBackground.png");
@@ -60,13 +62,13 @@ public class ChangeWeaponPN extends JPanel {
     JLabel text2;
 
     public ChangeWeaponPN(){
-
+        /* Generates array of weapons */
         weapons= new Weapons();
 
         this.setLayout(new BorderLayout());
 
 
-        weapon=weapons.weapons.get(8);
+        weapon=weapons.getWeapons().get(8);
 
         icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage().getScaledInstance((int) (framePrincipal.getWidth()/1.5f),(int) (framePrincipal.getHeight()/1.5f),Image.SCALE_DEFAULT));
         JButton rigth=new JButton();
@@ -74,7 +76,7 @@ public class ChangeWeaponPN extends JPanel {
 
         confirm.setName(weapon.getName());
 
-
+        /* Set Images to buttons */
         left.setBorder(null);
         left.setContentAreaFilled(false);
         left.setIcon(new ImageIcon(new ImageIcon("./media/arrowL.png").getImage().getScaledInstance(framePrincipal.getWidth()/10,framePrincipal.getHeight()/10,Image.SCALE_DEFAULT)));
@@ -119,7 +121,7 @@ public class ChangeWeaponPN extends JPanel {
         int width = this.getWidth();
         int height = this.getHeight();
 
-
+        /* Set First weapon to be show */
         gif = new JLabel(icon);
         gifP.setSize((int) (gif.getIcon().getIconWidth()/1.5),gif.getIcon().getIconHeight());
         gifP.setLayout(new BorderLayout());
@@ -130,10 +132,7 @@ public class ChangeWeaponPN extends JPanel {
         gif_info.setLayout(new GridLayout(0,4));
 
         war.setLayout(new BorderLayout());
-        //war.setLayout(new GridLayout(1,2));
 
-
-        //stats.setLayout(new BoxLayout(stats, BoxLayout.Y_AXIS));
         stats.setLayout(new FlowLayout());
 
 
@@ -182,6 +181,7 @@ public class ChangeWeaponPN extends JPanel {
         this.add(confirm,BorderLayout.SOUTH);
         this.add(war,BorderLayout.CENTER);
 
+        /* Add's functionality to buttons */
         rigth.addActionListener(
                 new ActionListener() {
                     @Override
@@ -219,6 +219,7 @@ public class ChangeWeaponPN extends JPanel {
 
         );
 
+        /* Set Background visible */
         gif.setOpaque(false);
         gifP.setOpaque(false);
         gif_info.setOpaque(false);
@@ -234,7 +235,7 @@ public class ChangeWeaponPN extends JPanel {
 
     }
 
-    public void init(){
+    public void init(){  /* Updates the information and repaints the panel */
 
         weapon=usableWeapons.get(num);
         text2.setText(weapon.getName());
@@ -268,9 +269,9 @@ public class ChangeWeaponPN extends JPanel {
     }
 
 
-    public void initWeapon(){
+    public void initWeapon(){  /* Updates the information and repaints the panel when the player changes character */
 
-        weapon=weapons.weapons.get(8);
+        weapon=weapons.getWeapons().get(8);
         text2.setText(weapon.getName());
 
         icon = new ImageIcon(new ImageIcon(weapon.getImage()).getImage());

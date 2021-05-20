@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 
 public class MainMenuPN extends JPanel {
 
@@ -36,7 +37,12 @@ public class MainMenuPN extends JPanel {
 
 
     public MainMenuPN(){
+
         framePrincipal.setMySqlCon(new Connect());
+
+
+
+
         this.setLayout(null);
 
         MainMenuPN menuPanel = this;
@@ -162,22 +168,54 @@ public class MainMenuPN extends JPanel {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        PlayPN playPanel= (PlayPN) framePrincipal.getCards().getComponents()[1];
+                        PlayPN playPanel= framePrincipal.getPlayPN();
 
                         /* If character is not selected, it will not change the panel */
                         if (playPanel.getPlayerWarrior()==null){
                             System.out.println("Tienes que escojer un personaje antes");
                         }else {
                             /* Change panel to figth */
-                            playPanel.setImgBackground();
                             CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                             cl.show(framePrincipal.getCards(), "PeleaPanel");
+
+                            /* Reset enemy warrior */
+                            playPanel.setEnemyWarrior(playPanel.randomEnemy());
+                            while (playPanel.getPlayerWarrior().getName().equalsIgnoreCase(playPanel.getEnemyWarrior().getName())){
+                                playPanel.setEnemyWarrior(playPanel.randomEnemy());
+                            }
+
+                            /* Clean the console */
+                            playPanel.getConsole().setText("");
+
+                            /* Reset player health */
+                            switch (playPanel.getPlayerUser().warrior.getRace().getName()){
+                                case "human":
+                                    playPanel.getPlayerUser().warrior.setRace(framePrincipal.getMySqlCon().getHuman());
+                                    break;
+                                case "dwarf":
+                                    playPanel.getPlayerUser().warrior.setRace(framePrincipal.getMySqlCon().getDwarf());
+                                    break;
+                                case "elf":
+                                    playPanel.getPlayerUser().warrior.setRace(framePrincipal.getMySqlCon().getElf());
+                                    break;
+                            }
+
+                            playPanel.getCharacterImage().setIcon(new ImageIcon(playPanel.getPlayerUser().warrior.getBstandLoop()));
+
+
+                            /* Reset health bars */
+                            playPanel.setHealthBars();
+
+                            playPanel.getFigthBT().setVisible(true);
+
+                            playPanel.setImgBackground();
+
                         }
 
                         playPanel.setHealthBars();
 
                         /* Set music for new panel */
-                        Main.musica("ChangeCharacter");
+                        Main.musica("Figth");
 
                     }
                 }
@@ -218,10 +256,10 @@ public class MainMenuPN extends JPanel {
                             /* Change panel to figth */
                             CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                             cl.show(framePrincipal.getCards(),"ChangeWeapon");
+
+                            Main.musica("ChangeCharacter");
                         }
 
-
-                        Main.musica("ChangeCharacter");
                     }
                 }
         );
@@ -236,6 +274,7 @@ public class MainMenuPN extends JPanel {
                         framePrincipal.newRankPN();
                         CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                         cl.show(framePrincipal.getCards(),"Ranking");
+                        Main.musica("Ranking");
                     }
                 }
         );

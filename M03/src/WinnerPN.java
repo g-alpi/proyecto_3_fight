@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class WinnerPN extends JPanel {
-    User winner;
-    User loser;
-    Image backgroundImg;
-    Font font;
+    private User winner;
+    private User loser;
+    private Image backgroundImg;
+    private Font font;
     public WinnerPN(){
 
         try{
@@ -38,7 +38,7 @@ public class WinnerPN extends JPanel {
         User player=framePrincipal.getPlayPN().getPlayerUser();
         User enemy=framePrincipal.getPlayPN().getEnemyUser();
 
-        if (player.warrior.race.getHealth()<=0){
+        if (player.getWarrior().getRace().getHealth()<=0){
             winner=enemy;
             loser=player;
         } else{
@@ -49,7 +49,7 @@ public class WinnerPN extends JPanel {
         JPanel textPN = new JPanel();
         textPN.setLayout(new GridLayout(3,0));
 
-        String wins = winner.warrior.getName()+" wins";
+        String wins = winner.getWarrior().getName()+" wins";
         wins=wins.toLowerCase(Locale.ROOT);
         JLabel text = new JLabel(wins);
         text.setHorizontalAlignment(SwingConstants.CENTER);
@@ -72,8 +72,8 @@ public class WinnerPN extends JPanel {
         blank.setOpaque(false);
         warriors.add(blank);
 
-        ImageIcon winnerGif = new ImageIcon("./warriors/dance_"+winner.warrior.getName()+".gif");
-        ImageIcon loserGif = new ImageIcon("./warriors/cry_"+loser.warrior.getName()+".gif");
+        ImageIcon winnerGif = new ImageIcon("./warriors/dance_"+winner.getWarrior().getName()+".gif");
+        ImageIcon loserGif = new ImageIcon("./warriors/cry_"+loser.getWarrior().getName()+".gif");
 
         JLabel winL = new JLabel(winnerGif);
         warriors.add(winL);
@@ -136,28 +136,35 @@ public class WinnerPN extends JPanel {
                             playPanel.setEnemyWarrior(playPanel.randomEnemy());
                         }
 
-                        /* Reset health bars */
-                        playPanel.setHealthBars();
+
 
                         /* Clean the console */
                         playPanel.getConsole().setText("");
 
                         /* Reset player health */
-                        switch (playPanel.getPlayerUser().warrior.getRace().getName()){
-                            case "Humano":
-                                playPanel.getPlayerUser().warrior.getRace();
+                        switch (playPanel.getPlayerUser().getWarrior().getRace().getName()){
+                            case "human":
+                                playPanel.getPlayerUser().getWarrior().setRace(framePrincipal.getMySqlCon().getHuman());
                                 break;
-                            case "Dwarf":
-
+                            case "dwarf":
+                                playPanel.getPlayerUser().getWarrior().setRace(framePrincipal.getMySqlCon().getDwarf());
                                 break;
-                            case "Elf":
-
+                            case "elf":
+                                playPanel.getPlayerUser().getWarrior().setRace(framePrincipal.getMySqlCon().getElf());
                                 break;
-
                         }
 
+                        playPanel.getCharacterImage().setIcon(new ImageIcon(playPanel.getPlayerUser().getWarrior().getBstandLoop()));
+
+                        /* Reset health bars */
+                        playPanel.setHealthBars();
+
+                        playPanel.getFigthBT().setVisible(true);
+
+                        playPanel.setImgBackground();
+
                         /* Set music for new panel */
-                        Main.musica("ChangeCharacter");
+                        Main.musica("Figth");
                     }
                 }
         );
