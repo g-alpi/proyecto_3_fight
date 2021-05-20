@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 
 public class MainMenuPN extends JPanel {
 
@@ -23,7 +24,7 @@ public class MainMenuPN extends JPanel {
 
     private JButton rankingBT = new JButton(new ImageIcon("./media/button_ranking.png"));
 
-    private JButton options = new JButton();
+    private JButton exitBT = new JButton(new ImageIcon("./media/button_exit.png"));
 
 
 
@@ -36,6 +37,12 @@ public class MainMenuPN extends JPanel {
 
 
     public MainMenuPN(){
+
+        framePrincipal.setMySqlCon(new Connect());
+
+
+
+
         this.setLayout(null);
 
         MainMenuPN menuPanel = this;
@@ -67,8 +74,8 @@ public class MainMenuPN extends JPanel {
                         rankingBT.setIcon(rankingBT.getIcon());
                         rankingBT.setBounds(framePrincipal.getWidth()/2+500-changeCharacterBT.getIcon().getIconWidth()/2, framePrincipal.getHeight()/2+50,rankingBT.getIcon().getIconWidth(),rankingBT.getIcon().getIconHeight());
 
-
-
+                        exitBT.setIcon(exitBT.getIcon());
+                        exitBT.setBounds(10,10,exitBT.getIcon().getIconWidth(),exitBT.getIcon().getIconHeight());
 
 
 
@@ -136,6 +143,19 @@ public class MainMenuPN extends JPanel {
                 }
         );
 
+        exitBT.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        exitBT.setIcon(new ImageIcon("./media/button_exit-hover.png"));
+                    }
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        exitBT.setIcon(new ImageIcon("./media/button_exit.png"));
+                    }
+                }
+        );
+
         /* Init of all components */
         mainMenuLB.setBounds(framePrincipal.getWidth()/2-imgMenu.getIconWidth()/2,50,630,350);
         mainMenuLB.setOpaque(false);
@@ -148,7 +168,7 @@ public class MainMenuPN extends JPanel {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        PlayPN playPanel= (PlayPN) framePrincipal.getCards().getComponents()[1];
+                        PlayPN playPanel= framePrincipal.getPlayPN();
 
                         /* If character is not selected, it will not change the panel */
                         if (playPanel.getPlayerWarrior()==null){
@@ -157,10 +177,45 @@ public class MainMenuPN extends JPanel {
                             /* Change panel to figth */
                             CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                             cl.show(framePrincipal.getCards(), "PeleaPanel");
+
+                            /* Reset enemy warrior */
+                            playPanel.setEnemyWarrior(playPanel.randomEnemy());
+                            while (playPanel.getPlayerWarrior().getName().equalsIgnoreCase(playPanel.getEnemyWarrior().getName())){
+                                playPanel.setEnemyWarrior(playPanel.randomEnemy());
+                            }
+
+                            /* Clean the console */
+                            playPanel.getConsole().setText("");
+
+                            /* Reset player health */
+                            switch (playPanel.getPlayerUser().warrior.getRace().getName()){
+                                case "human":
+                                    playPanel.getPlayerUser().warrior.setRace(framePrincipal.getMySqlCon().getHuman());
+                                    break;
+                                case "dwarf":
+                                    playPanel.getPlayerUser().warrior.setRace(framePrincipal.getMySqlCon().getDwarf());
+                                    break;
+                                case "elf":
+                                    playPanel.getPlayerUser().warrior.setRace(framePrincipal.getMySqlCon().getElf());
+                                    break;
+                            }
+
+                            playPanel.getCharacterImage().setIcon(new ImageIcon(playPanel.getPlayerUser().warrior.getBstandLoop()));
+
+
+                            /* Reset health bars */
+                            playPanel.setHealthBars();
+
+                            playPanel.getFigthBT().setVisible(true);
+
+                            playPanel.setImgBackground();
+
                         }
 
+                        playPanel.setHealthBars();
+
                         /* Set music for new panel */
-                        Main.musica("ChangeCharacter");
+                        Main.musica("Figth");
 
                     }
                 }
@@ -201,10 +256,10 @@ public class MainMenuPN extends JPanel {
                             /* Change panel to figth */
                             CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                             cl.show(framePrincipal.getCards(),"ChangeWeapon");
+
+                            Main.musica("ChangeCharacter");
                         }
 
-
-                        Main.musica("ChangeCharacter");
                     }
                 }
         );
@@ -216,29 +271,27 @@ public class MainMenuPN extends JPanel {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
+                        framePrincipal.newRankPN();
                         CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                         cl.show(framePrincipal.getCards(),"Ranking");
+                        Main.musica("Ranking");
                     }
                 }
         );
         this.add(rankingBT);
 
-
-        /*
-        options.setBorder(null);
-        options.setContentAreaFilled(false);
-        // Adding function to change to Options panel
-        options.addActionListener(
+        exitBT.setBorder(null);
+        exitBT.setContentAreaFilled(false);
+        exitBT.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
-                        cl.show(framePrincipal.getCards(),"Options");
+                        System.exit(0);
                     }
                 }
         );
-        this.add(options);
-        */
+        this.add(exitBT);
+
 
         /* Adding Characters and Weapong preview */
         this.add(characterIMG);

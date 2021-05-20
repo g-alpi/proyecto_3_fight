@@ -1,188 +1,162 @@
+import javax.swing.*;
+import java.awt.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class Connect {
+    private static Frame framePrincipal= (Frame) Frame.getFrames()[0];
+    private ArrayList<String> credentials;
+    private static String user;
+    private static String passwd;
 
-    //SELECTS
-    public static void seeWeapons(String user,String passwd) {
-        try {
-            Connection con = null;
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
+    public static String getUser() {
+        return user;
+    }
 
-            Statement stm=con.createStatement();
-            ResultSet rs=null;
+    public static void setUser(String user) {
+        Connect.user = user;
+    }
 
-            rs=stm.executeQuery("select * from weapons");
-            ResultSetMetaData obj= rs.getMetaData();
-            System.out.println("Weapons");
-            System.out.println("--------------------------");
-            while (rs.next()){
+    public static String getPasswd() {
+        return passwd;
+    }
 
-                System.out.println(obj.getColumnName(1)+": "+rs.getInt(1));
-                System.out.println(obj.getColumnName(2)+": "+rs.getString(2));
-                System.out.println(obj.getColumnName(3)+": "+rs.getString(3));
-                System.out.println(obj.getColumnName(4)+": "+rs.getInt(4));
-                System.out.println(obj.getColumnName(5)+": "+rs.getInt(5));
-                System.out.println(obj.getColumnName(6)+": "+rs.getString(6));
-                System.out.println(obj.getColumnName(7)+": "+rs.getInt(7));
-                System.out.println("--------------------------");
+    public static void setPasswd(String passwd) {
+        Connect.passwd = passwd;
+    }
 
+    public Connect(){
+        ConnectPN cred = new ConnectPN();
+        while (!cred.getConfirmed()){
+            System.out.print("");
+        }
+
+        framePrincipal.setUsername(cred.getUser());
+        String tempUser = cred.getUser();
+        tempUser.replace("\""," ");
+        tempUser.replace("'"," ");
+        tempUser.replace("\\"," ");
+        tempUser.replace("="," ");
+        tempUser.replace("\""," ");
+        tempUser.replace(";"," ");
+        cred.setUser(tempUser);
+        
+        user=cred.getMySqlUser();
+        user.replace("\""," ");
+        user.replace("'"," ");
+        user.replace("\\"," ");
+        user.replace("="," ");
+        user.replace("\""," ");
+        user.replace(";"," ");
+        
+        passwd=cred.getMySqlPwd();
+        passwd.replace("\""," ");
+        passwd.replace("'"," ");
+        passwd.replace("\\"," ");
+        passwd.replace("="," ");
+        passwd.replace("\""," ");
+        passwd.replace(";"," ");
+
+        if (tempUser.length()>7){
+            JOptionPane.showMessageDialog(null, "Username can't be longer than 7", "Error", JOptionPane.ERROR_MESSAGE);
+            new Connect();
+        }else {
+            try {
+                Connection con = null;
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
+            } catch (ClassNotFoundException | SQLException e) {
+                JOptionPane.showMessageDialog(null, "Wrong credentials", "Error", JOptionPane.ERROR_MESSAGE);
+                new Connect();
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
 
     }
 
-    public static void seeRace(String user,String passwd) {
+    public static ArrayList getMostDmgDealt(){
+        ArrayList mostDmg=null;
         try {
+            mostDmg=new ArrayList();
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
             con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
 
+            Statement stm_p=con.createStatement();
+            ResultSet rs_p=stm_p.executeQuery("select count(*) from ranking");
+            rs_p.next();
+            if (rs_p.getInt(1)==0){
+                mostDmg.add(" NULL ");
+                mostDmg.add("_");
+                return mostDmg;
+            }
+
             Statement stm=con.createStatement();
             ResultSet rs=null;
 
-            rs=stm.executeQuery("select * from race");
-            ResultSetMetaData obj= rs.getMetaData();
-            System.out.println("Races");
-            System.out.println("--------------------------");
-            while (rs.next()){
+            rs=stm.executeQuery("select player_id,max(injuries_caused) from battle");
 
-                System.out.println(obj.getColumnName(1)+": "+rs.getString(1));
-                System.out.println(obj.getColumnName(2)+": "+rs.getInt(2));
-                System.out.println(obj.getColumnName(3)+": "+rs.getInt(3));
-                System.out.println(obj.getColumnName(4)+": "+rs.getInt(4));
-                System.out.println(obj.getColumnName(5)+": "+rs.getInt(5));
-                System.out.println(obj.getColumnName(6)+": "+rs.getInt(6));
-                System.out.println(obj.getColumnName(7)+": "+rs.getInt(7));
-                System.out.println("--------------------------");
+            rs.next();
 
-            }
+            Statement stm_n=con.createStatement();
+            ResultSet rs_n=stm_n.executeQuery("select players.player_name,battle.injuries_caused from battle Inner join players on players.player_id=battle.player_id where injuries_caused=(select max(injuries_caused) from battle) limit 1;");
+            rs_n.next();
+
+            mostDmg.add(rs_n.getString(1));
+            mostDmg.add(rs_n.getInt(2));
+
+            return mostDmg;
+
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            System.out.println("Error");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
+        return mostDmg;
     }
-
-    public static void seeBattle(String user,String passwd) {
+    public static ArrayList getMostDmgTaken(){
+        ArrayList mostDmg=null;
         try {
+            mostDmg=new ArrayList();
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
             con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
 
-            Statement stm=con.createStatement();
-            ResultSet rs=null;
-
-            rs=stm.executeQuery("select * from battle");
-            ResultSetMetaData obj= rs.getMetaData();
-            System.out.println("Battles");
-            System.out.println("--------------------------");
-            while (rs.next()){
-
-                System.out.println(obj.getColumnName(1)+": "+rs.getInt(1));
-                System.out.println(obj.getColumnName(2)+": "+rs.getInt(2));
-                System.out.println(obj.getColumnName(3)+": "+rs.getString(3));
-                System.out.println(obj.getColumnName(4)+": "+rs.getString(4));
-                System.out.println(obj.getColumnName(5)+": "+rs.getString(5));
-                System.out.println(obj.getColumnName(6)+": "+rs.getString(6));
-                System.out.println(obj.getColumnName(7)+": "+rs.getString(7));
-                System.out.println(obj.getColumnName(7)+": "+rs.getInt(7));
-                System.out.println(obj.getColumnName(8)+": "+rs.getInt(8));
-                System.out.println(obj.getColumnName(9)+": "+rs.getInt(9));
-
-                System.out.println("--------------------------");
-
+            Statement stm_p=con.createStatement();
+            ResultSet rs_p=stm_p.executeQuery("select count(*) from ranking");
+            rs_p.next();
+            if (rs_p.getInt(1)==0){
+                mostDmg.add(" NULL ");
+                mostDmg.add(0);
+                return mostDmg;
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static void seeWarriors(String user,String passwd) {
-        try {
-            Connection con = null;
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
 
             Statement stm=con.createStatement();
             ResultSet rs=null;
 
-            rs=stm.executeQuery("select * from warriors");
-            ResultSetMetaData obj= rs.getMetaData();
-            System.out.println("Warriors");
-            System.out.println("--------------------------");
-            while (rs.next()){
+            rs=stm.executeQuery("select player_id,max(injuries_suffered) from battle");
 
-                System.out.println(obj.getColumnName(1)+": "+rs.getString(1));
-                System.out.println(obj.getColumnName(2)+": "+rs.getString(2));
-                System.out.println(obj.getColumnName(3)+": "+rs.getString(3));
-                System.out.println(obj.getColumnName(4)+": "+rs.getString(4));
-                System.out.println(obj.getColumnName(5)+": "+rs.getString(5));
-                System.out.println(obj.getColumnName(6)+": "+rs.getString(6));
-                System.out.println(obj.getColumnName(7)+": "+rs.getString(7));
-                System.out.println(obj.getColumnName(8)+": "+rs.getString(8));
-                System.out.println(obj.getColumnName(9)+": "+rs.getString(9));
-                System.out.println(obj.getColumnName(10)+": "+rs.getString(10));
-                System.out.println(obj.getColumnName(11)+": "+rs.getString(11));
-                System.out.println(obj.getColumnName(12)+": "+rs.getString(12));
-                System.out.println(obj.getColumnName(13)+": "+rs.getString(13));
-                System.out.println(obj.getColumnName(14)+": "+rs.getString(14));
-                System.out.println(obj.getColumnName(15)+": "+rs.getString(15));
-                System.out.println(obj.getColumnName(16)+": "+rs.getString(16));
-                System.out.println(obj.getColumnName(17)+": "+rs.getString(17));
+            rs.next();
 
-                System.out.println("--------------------------");
+            Statement stm_n=con.createStatement();
+            ResultSet rs_n=stm_n.executeQuery("select players.player_name,battle.injuries_suffered from battle Inner join players on players.player_id=battle.player_id where injuries_suffered=(select max(injuries_suffered) from battle) limit 1;");
+            rs_n.next();
 
-            }
+            mostDmg.add(rs_n.getString(1));
+            mostDmg.add(rs_n.getInt(2));
+
+            return mostDmg;
+
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            System.out.println("Error");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
+        return mostDmg;
     }
 
-
-    public static void seePlayers(String user,String passwd) {
-        try {
-            Connection con = null;
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
-
-            Statement stm=con.createStatement();
-            ResultSet rs=null;
-
-            rs=stm.executeQuery("select * from players");
-            ResultSetMetaData obj= rs.getMetaData();
-            System.out.println("Players");
-            System.out.println("--------------------------");
-            while (rs.next()){
-
-                System.out.println(obj.getColumnName(1)+": "+rs.getInt(1));
-                System.out.println(obj.getColumnName(2)+": "+rs.getString(2));
-
-                System.out.println("--------------------------");
-
-            }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static ArrayList<ArrayList> getRanking(String user,String passwd) {
+    public static ArrayList<ArrayList> getRanking() {
         ArrayList<ArrayList> rank = new ArrayList();
         try {
             Connection con = null;
@@ -195,7 +169,7 @@ public class Connect {
             rs=stm.executeQuery("select * from ranking order by total_points DESC");
             ResultSetMetaData obj= rs.getMetaData();
 
-            for (int i = 1; i < 6; ++i){
+            for (int i = 1; i < 11; ++i){
                 ArrayList<String> campo = new ArrayList();
                 if (rs.next()){
                     Statement stm2=con.createStatement();
@@ -215,68 +189,69 @@ public class Connect {
         return rank;
     }
 
-    //INSERTS
-    public static void insertWarriors(String user,String passwd) {
+    public static Race getHuman(){
+        Race human = null;
         try {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
-            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
-            Statement stm=con.createStatement();
-            ResultSet rs=null;
-            Warriors w= new Warriors();
-            Scanner s = new Scanner(System.in);
+            con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
 
-//            rs=stm.executeQuery("Select warrior_id from warriors order by warrior_id desc limit 1");
-//            rs.next();
-//            int id;
-//            try {
-//                id= rs.getInt(1)+1;
-//            }
-//            catch (Exception e){
-//                 id=1;
-//            }
-            System.out.println("Que personaje quieres insertar?");
-            int contador=0;
-            for (Warrior a:w.warriors){
-                contador++;
-                System.out.println(contador+".- "+a.getName());
-            }
-            int opcion=0;
-            opcion=s.nextInt();
-
-            PreparedStatement pstm = con.prepareStatement("insert into warriors values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-            pstm.setString(1,w.warriors.get(opcion).getName());
-            pstm.setString(2,w.warriors.get(opcion).getPortrait());
-            pstm.setString(3,w.warriors.get(opcion).getRace().name);
-            pstm.setString(4,w.warriors.get(opcion).getFstandLoop());
-            pstm.setString(5,w.warriors.get(opcion).getBstandLoop());
-            pstm.setString(6,w.warriors.get(opcion).getFattack());
-            pstm.setString(7,w.warriors.get(opcion).getBattack());
-            pstm.setString(8,w.warriors.get(opcion).getFattack_bow());
-            pstm.setString(9,w.warriors.get(opcion).getFattack_bow());
-            pstm.setString(10,w.warriors.get(opcion).getFdie());
-            pstm.setString(11,w.warriors.get(opcion).getBdie());
-            pstm.setString(12,w.warriors.get(opcion).getFwound());
-            pstm.setString(13,w.warriors.get(opcion).getBwound());
-            pstm.setString(14,w.warriors.get(opcion).getFdodge());
-            pstm.setString(15,w.warriors.get(opcion).getBdodge());
-            pstm.setString(16,w.warriors.get(opcion).getDance());
-            pstm.setString(17,w.warriors.get(opcion).getCry());
-            pstm.setString(18,w.warriors.get(opcion).getFstandLoop());
-
-            pstm.executeUpdate();
-
-
+            Statement stm = con.createStatement();
+            ResultSet rs = stm.executeQuery("select * from race where race_name='human';");
+            rs.next();
+            human= new Race(rs.getString(1),rs.getInt(2),rs.getInt(3),rs.getInt(4),rs.getInt(5),rs.getInt(6),rs.getInt(7));
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            return human;
         }
+    }
+    public static Race getElf(){
+        Race elf = null;
+        try {
+            Connection con = null;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
 
+            Statement stm = con.createStatement();
+            ResultSet rs = stm.executeQuery("select * from race where race_name='elf';");
+            rs.next();
+            elf= new Race(rs.getString(1),rs.getInt(2),rs.getInt(3),rs.getInt(4),rs.getInt(5),rs.getInt(6),rs.getInt(7));
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            return elf;
+        }
+    }
+    public static Race getDwarf(){
+        Race dwarf = null;
+        try {
+            Connection con = null;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
+
+            Statement stm = con.createStatement();
+            ResultSet rs = stm.executeQuery("select * from race where race_name='dwarf';");
+            rs.next();
+            dwarf= new Race(rs.getString(1),rs.getInt(2),rs.getInt(3),rs.getInt(4),rs.getInt(5),rs.getInt(6),rs.getInt(7));
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            return dwarf;
+        }
     }
 
-    public static void downloadWarriors(Warriors w,String user,String passwd){
+
+    public static void downloadWarriors(Warriors w){
         try {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -293,7 +268,7 @@ public class Connect {
 
                 Race race= new Race();
                 if (rs.getString(3).equalsIgnoreCase("human")){
-                    w.warriors.add(new Warrior(rs.getString(1),r.getHuman(),
+                    w.getWarriors().add(new Human(rs.getString(1),getHuman(),
                             null,
                             rs.getString(2),
                             rs.getString(4),
@@ -313,9 +288,9 @@ public class Connect {
                             rs.getString(18)));
                 }
                 else if (rs.getString(3).equalsIgnoreCase("dwarf")){
-                    w.warriors.add(new Warrior(
+                    w.getWarriors().add(new Dwarf(
                             rs.getString(1),
-                            r.getDwarf(),
+                            getDwarf(),
                             null,
                             rs.getString(2),
                             rs.getString(4),
@@ -335,7 +310,7 @@ public class Connect {
                             rs.getString(18)));
                 }
                 else if (rs.getString(3).equalsIgnoreCase("elf")){
-                    w.warriors.add(new Warrior(rs.getString(1),r.getElf(),
+                    w.getWarriors().add(new Elf(rs.getString(1),getElf(),
                             null,
                             rs.getString(2),
                             rs.getString(4),
@@ -357,25 +332,13 @@ public class Connect {
             }
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            framePrincipal.setMySqlCon(new Connect());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public static void showWarriors(){
-        Warriors w = new Warriors();
-        Connect.downloadWarriors(w,"root","alumne");
-        for (Warrior wep:w.warriors){
-            System.out.println(wep.getName() + " " + wep.getRace().getName());
-
-        }
-
-        System.out.println();
-    }
-
-
-    public static void downloadWeapons(Weapons w,String user,String passwd){
+    public static void downloadWeapons(Weapons w){
         try {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -390,88 +353,74 @@ public class Connect {
             while (rs.next()){
                 ArrayList<Race>raza= new ArrayList<>();
                 if (rs.getString(5).equalsIgnoreCase("human")){
-                    raza.add(r.getHuman());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    raza.add(getHuman());
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("dwarf")){
-                    raza.add(r.getDwarf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    raza.add(getDwarf());
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("elf")){
-                    raza.add(r.getElf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    raza.add(getElf());
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("human,elf")){
-                    raza.add(r.getHuman());
-                    raza.add(r.getElf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    raza.add(getHuman());
+                    raza.add(getElf());
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("human,dwarf")){
-                    raza.add(r.getHuman());
-                    raza.add(r.getDwarf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    raza.add(getHuman());
+                    raza.add(getDwarf());
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
                 else if (rs.getString(5).equalsIgnoreCase("human,elf,dwarf")){
-                    raza.add(r.getHuman());
-                    raza.add(r.getElf());
-                    raza.add(r.getDwarf());
-                    w.weapons.add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
+                    raza.add(getHuman());
+                    raza.add(getElf());
+                    raza.add(getDwarf());
+                    w.getWeapons().add(new Weapon(rs.getString(1),rs.getInt(3),rs.getInt(4),rs.getString(2),raza,rs.getInt(6)));
                 }
             }
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            framePrincipal.setMySqlCon(new Connect());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
+    public void uploadBattle(int idP){
+        User player=framePrincipal.getPlayPN().getPlayerUser();
+        User enemy=framePrincipal.getPlayPN().getEnemyUser();
 
-    public static void showWeapons(){
-        Weapons w = new Weapons();
-        Connect.downloadWeapons(w,"root","alumne");
-        for (Weapon wep:w.weapons){
-            System.out.print(wep.getName() + " " + wep.getImage() + " " + wep.getSpeedBonus() + " " + wep.getStrenghtBonus()+" ");
-            for (Race r:wep.getWielders()){
-                System.out.print(r.getName()+" ");
-            }
-            System.out.println(wep.getPoints());
-        }
-
-        System.out.println();
-    }
-
-    public static void newParty(int player_id, String warrior_name,String warrior_weapon_name,String opponent_name,String opponent_weapon_name,String user,String passwd){
         try {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
             con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
-            Statement stm=con.createStatement();
-            ResultSet rs=null;
 
-            rs=stm.executeQuery("Select battle_id from battle order by battle_id desc limit 1");
-            rs.next();
-            int id;
-            try {
-                id= rs.getInt(1)+1;
+            int idB;
+
+            Statement stm_idB=con.createStatement();
+            ResultSet rs_idB=stm_idB.executeQuery("Select count(*),max(battle_id) from battle");
+            rs_idB.next();
+            if (rs_idB.getInt(1)==0){
+                idB= 1;
+            } else {
+                idB=rs_idB.getInt(2)+1;
             }
-            catch (Exception e){
-                 id=1;
-            }
+
             PreparedStatement pstm = con.prepareStatement("insert into battle values (?,?,?,?,?,?,?,?,?)");
-            pstm.setInt(1,id);
-            pstm.setInt(2,player_id);
-            pstm.setString(3,warrior_name);
-            pstm.setString(4,warrior_weapon_name);
-            pstm.setString(5,opponent_name);
-            pstm.setString(6,opponent_weapon_name);
-            pstm.setInt(7,0);
-            pstm.setInt(8,0);
-            pstm.setInt(9,0);
+            pstm.setInt(1,idB);
+            pstm.setInt(2,idP);
+            pstm.setString(3,player.getWarrior().getName());
+            pstm.setString(4,player.getWarrior().getWeapon().getName());
+            pstm.setString(5,enemy.getWarrior().getName());
+            pstm.setString(6,player.getWarrior().getWeapon().getName());
+            pstm.setInt(7,player.getInjuriesCaused());
+            pstm.setInt(8,player.getInjuriesSuffered());
+            pstm.setInt(9,player.getPoints());
             pstm.executeUpdate();
 
-            Warriors w= new Warriors();
-            Scanner s = new Scanner(System.in);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -480,74 +429,35 @@ public class Connect {
 
     }
 
-
-    public static void updateInjuriesCaused(int player_id,int num,String user,String passwd){
+    public int uploadUser() {
+        int id = 0;
         try {
             Connection con = null;
             Class.forName("com.mysql.cj.jdbc.Driver");
-            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
-            PreparedStatement pstm = con.prepareStatement("update battle set injuries_caused=injuries_caused+"+num+" where player_id="+player_id);
-            pstm.executeUpdate();
+            con = DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC", user, passwd);
+
+            User player = framePrincipal.getPlayPN().getPlayerUser();
+
+            Statement stm_id = con.createStatement();
+            ResultSet rs_id = stm_id.executeQuery("select count(*),max(player_id) from players;");
+            rs_id.next();
+            if (rs_id.getInt(1) == 0) {
+                id = 1;
+            } else {
+                id = rs_id.getInt(2) + 1;
+            }
+            Statement stm_pl = con.createStatement();
+            stm_pl.executeUpdate("insert into players values(" + id + ",\"" + player.getName() + "\")");
+
+            Statement stm_rk = con.createStatement();
+            stm_rk.executeUpdate("insert into ranking values(" + id + "," + player.getPoints() + ",\"" + player.getWarrior().getName() + "\")");
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            return id;
         }
     }
-
-    public static void updateInjuriesSuffered(int player_id,int num,String user,String passwd){
-        try {
-            Connection con = null;
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
-            PreparedStatement pstm = con.prepareStatement("update battle set injuries_sufered=injuries_sufered+"+num+" where player_id="+player_id);
-            pstm.executeUpdate();
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void updatePoints(int player_id,int num,String user,String passwd){
-        try {
-            Connection con = null;
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
-            PreparedStatement pstm = con.prepareStatement("update battle set battle_points=battle_points+"+num+" where player_id="+player_id);
-            pstm.executeUpdate();
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public static void setRanking(int player_id,int total_points,String warrior_name,String user,String passwd){
-        try {
-            Connection con = null;
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            con= DriverManager.getConnection("jdbc:mysql://127.0.0.1/battles?serverTimezone=UTC",user,passwd);
-
-            PreparedStatement pstm = con.prepareStatement("insert into ranking values (?,?,?)");
-            pstm.setInt(1,player_id);
-            pstm.setInt(2,total_points);
-            pstm.setString(3,warrior_name);
-            pstm.executeUpdate();
-
-            Warriors w= new Warriors();
-            Scanner s = new Scanner(System.in);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
 }

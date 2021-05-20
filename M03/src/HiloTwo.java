@@ -15,8 +15,8 @@ public class HiloTwo extends Thread{
         super(name);
     }
 
-
     public void run() {
+        /* Plays song */
         while (true) {
             try {
                 String path = "";

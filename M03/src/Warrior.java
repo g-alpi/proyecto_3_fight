@@ -1,23 +1,23 @@
 public class Warrior {
-    String name;
-    Race race;
-    Weapon weapon;
-    String portrait;
-    String FstandLoop;
-    String BstandLoop;
-    String Fattack;
-    String Battack;
-    String Fattack_bow;
-    String Battack_bow;
-    String Fdie;
-    String Bdie;
-    String Fwound;
-    String Bwound;
-    String Fdodge;
-    String Bdodge;
-    String dance;
-    String cry;
-    String portraitGif;
+    private String name;
+    private Race race;
+    private Weapon weapon;
+    private String portrait;
+    private String FstandLoop;
+    private String BstandLoop;
+    private String Fattack;
+    private String Battack;
+    private String Fattack_bow;
+    private String Battack_bow;
+    private String Fdie;
+    private String Bdie;
+    private String Fwound;
+    private String Bwound;
+    private String Fdodge;
+    private String Bdodge;
+    private String dance;
+    private String cry;
+    private String portraitGif;
 
     public String getName() {
         return name;
@@ -97,6 +97,10 @@ public class Warrior {
 
     public void setWeapon(Weapon weapon) {
         this.weapon = weapon;
+    }
+
+    public void setRace(Race race) {
+        this.race = race;
     }
 
     public Warrior(String name, Race race, Weapon weapon, String portrait, String portraitGif, String fstandLoop, String bstandLoop, String fattack, String battack, String fattack_bow, String battack_bow, String fdie, String bdie, String fwound, String bwound, String fdodge, String bdodge, String dance, String cry) {

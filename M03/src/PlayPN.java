@@ -1,9 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +9,7 @@ import java.util.Random;
 
 public class PlayPN extends JPanel {
 
-    Frame framePrincipal = (Frame) Frame.getFrames()[0];
+    private Frame framePrincipal = (Frame) Frame.getFrames()[0];
 
     /* Background IMG */
     private Image imgBackground = new ImageIcon("./media/mapElf.png").getImage().getScaledInstance(framePrincipal.getWidth(),framePrincipal.getHeight(),Image.SCALE_SMOOTH);
@@ -26,18 +23,24 @@ public class PlayPN extends JPanel {
     private JScrollPane sp = new JScrollPane(console);
     private JProgressBar healthPlayer = new JProgressBar();
     private JProgressBar healthEnemy = new JProgressBar();
-    private JButton boton = new JButton("Empezar pelea"); //Boton Temporal
-    private JButton boyon = new JButton("atras"); //Boton Temporal
+    private JButton figthBT = new JButton(new ImageIcon("./media/button_figth.png"));
 
     /* Player & Enemy info */
     private Warrior playerWarrior;
-    private User playerUser;
+    private User playerUser = new User(null,null);
 
     private Warrior enemyWarrior;
     private User enemyUser;
 
     private JLabel characterImage = new JLabel(new ImageIcon(new ImageIcon("./Warriors/BstandLoop_Pepe.gif").getImage().getScaledInstance(framePrincipal.getWidth()-500,framePrincipal.getHeight()-300,Image.SCALE_DEFAULT)));
     private JLabel enemiImage = new JLabel(new ImageIcon(new ImageIcon("./Warriors/FstandLoop_Pepe.gif").getImage().getScaledInstance(characterImage.getIcon().getIconWidth()-500,characterImage.getIcon().getIconHeight()-300,Image.SCALE_DEFAULT)));
+
+    private JLabel characterWeapon = new JLabel();
+    private JLabel enemiWeapon = new JLabel();
+
+    private Thread gameThread=null;
+
+    private int tiempo;
 
     public PlayPN(){
 
@@ -47,7 +50,6 @@ public class PlayPN extends JPanel {
 
         /* Generate random enemy warrior */
         enemyWarrior=randomEnemy();
-        enemyUser= new User("bot",enemyWarrior);
 
         /* Making all the components in the panel, resizable */
         this.addComponentListener(
@@ -58,12 +60,17 @@ public class PlayPN extends JPanel {
                         sp.setBounds(framePrincipal.getWidth()/2-250,framePrincipal.getHeight()-150,framePrincipal.getWidth()/2+250,300);
                         log.setBounds(sp.getX(),sp.getY()-20,sp.getWidth(),20);
 
+                        figthBT.setIcon(figthBT.getIcon());
+                        figthBT.setBounds(figthBT.getX(),figthBT.getY(),figthBT.getIcon().getIconWidth(),figthBT.getIcon().getIconHeight());
+
                         characterImage.setBounds(0-characterImage.getIcon().getIconWidth()/3+40,framePrincipal.getHeight()-characterImage.getIcon().getIconHeight()+characterImage.getIcon().getIconHeight()/6,characterImage.getIcon().getIconWidth(),characterImage.getIcon().getIconHeight());
                         enemiImage.setBounds(framePrincipal.getWidth()-enemiImage.getIcon().getIconWidth()/3*2,0,enemiImage.getIcon().getIconWidth(),enemiImage.getIcon().getIconHeight());
 
                         healthPlayer.setBounds(200,500,500,20);
+                        characterWeapon.setBounds(healthPlayer.getX()-105,healthPlayer.getY(),100,100);
 
                         healthEnemy.setBounds(framePrincipal.getWidth()-enemiImage.getWidth()-40,30,500,20);
+                        enemiWeapon.setBounds(healthEnemy.getX()-105,healthEnemy.getY(),100,100);
                     }
                 }
         );
@@ -85,45 +92,50 @@ public class PlayPN extends JPanel {
         console.setEditable(false);
         this.add(sp);
 
-        log.setEditable(true);
+        log.setEditable(false);
         this.add(log);
 
-        // Boton Temporal
-        boton.setBounds(100,100,100,100);
-        boton.addActionListener(
+        figthBT.setBorder(null);
+        figthBT.setContentAreaFilled(false);
+        figthBT.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        figthBT.setIcon(new ImageIcon("./media/button_figth-hover.png"));
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        figthBT.setIcon(new ImageIcon("./media/button_figth.png"));
+                    }
+                }
+        );
+
+        figthBT.setBounds(100,100,100,100);
+        figthBT.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        new Thread(){
-
+                        gameThread = new Thread(){
                             @Override
                             public void run() {
                                 gameLoop();
                             }
-                        }.start();
+                        };
+                        gameThread.start();
+                        figthBT.setVisible(false);
                     }
                 }
         );
-        this.add(boton);
-
-        // Boton Temporal
-        boyon.setBounds(400,100,100,100);
-        boyon.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
-                        cl.show(framePrincipal.getCards(),"MainMenu");
-                    }
-                }
-        );
-        this.add(boyon);
+        this.add(figthBT);
 
         this.add(characterImage);
         this.add(healthPlayer);
+        this.add(characterWeapon);
 
         this.add(enemiImage);
         this.add(healthEnemy);
+        this.add(enemiWeapon);
 
     }
 
@@ -150,60 +162,252 @@ public class PlayPN extends JPanel {
         Image img = backUP;
 
         String url="";
-        int tiempo=0;
 
         switch (animation){
             case "Bwound":
                 url=war.getBwound();
-                tiempo=2500;
+                switch (war.getName()){
+                    case "Epifania":
+                        tiempo=2000;
+                        break;
+                    case "Maria":
+                        tiempo=2000;
+                        break;
+                    case "Pepe":
+                        tiempo=2000;
+                        break;
+                    case "Torbjina":
+                        tiempo=2000;
+                        break;
+                    case "Torbjorn":
+                        tiempo=2000;
+                        break;
+                    case "Eduardo":
+                        tiempo=1600;
+                        break;
+                }
+
                 break;
             case "Battack":
                 if (war.getWeapon().name.equalsIgnoreCase("Bow")){
                     if (war.getRace().getName().equalsIgnoreCase("Elf")){
                         url=war.getBattack_bow();
-                        tiempo=860;
+                        switch (war.getName()){
+                            case "Epifania":
+                                tiempo=600;
+                                break;
+                            case "Eduardo":
+                                tiempo=600;
+                                break;
+                        }
                     }else{
                         url=war.getBattack();
-                        tiempo=1300;
+                        switch (war.getName()){
+                            case "Maria":
+                                tiempo=1000;
+                                break;
+                            case "Pepe":
+                                tiempo=1000;
+                                break;
+                            case "Torbjina":
+                                tiempo=1000;
+                                break;
+                            case "Torbjorn":
+                                tiempo=1000;
+                                break;
+                        }
                     }
                 }else{
                     url=war.getBattack();
-                    tiempo=1300;
+                    switch (war.getName()){
+                        case "Epifania":
+                            tiempo=1100;
+                            break;
+                        case "Maria":
+                            tiempo=1000;
+                            break;
+                        case "Pepe":
+                            tiempo=1000;
+                            break;
+                        case "Torbjina":
+                            tiempo=1000;
+                            break;
+                        case "Torbjorn":
+                            tiempo=1000;
+                            break;
+                        case "Eduardo":
+                            tiempo=1100;
+                            break;
+                    }
                 }
                 break;
             case "Bdodge":
                 url=war.getBdodge();
-                tiempo=1300;
+                switch (war.getName()){
+                    case "Epifania":
+                        tiempo=1000;
+                        break;
+                    case "Maria":
+                        tiempo=1000;
+                        break;
+                    case "Pepe":
+                        tiempo=1000;
+                        break;
+                    case "Torbjina":
+                        tiempo=1000;
+                        break;
+                    case "Torbjorn":
+                        tiempo=1000;
+                        break;
+                    case "Eduardo":
+                        tiempo=1100;
+                        break;
+                }
                 break;
             case "Bdie":
                 url=war.getBdie();
-                tiempo=3700;
+                switch (war.getName()){
+                    case "Epifania":
+                        tiempo=1950;
+                        break;
+                    case "Maria":
+                        tiempo=2000;
+                        break;
+                    case "Pepe":
+                        tiempo=2200;
+                        break;
+                    case "Torbjina":
+                        tiempo=1500;
+                        break;
+                    case "Torbjorn":
+                        tiempo=1800;
+                        break;
+                    case "Eduardo":
+                        tiempo=4150;
+                        break;
+                }
                 break;
             case "Fwound":
                 url=war.getFwound();
-                tiempo=2500;
+                switch (war.getName()){
+                    case "Epifania":
+                        tiempo=2000;
+                        break;
+                    case "Maria":
+                        tiempo=2000;
+                        break;
+                    case "Pepe":
+                        tiempo=2000;
+                        break;
+                    case "Torbjina":
+                        tiempo=2000;
+                        break;
+                    case "Torbjorn":
+                        tiempo=2000;
+                        break;
+                    case "Eduardo":
+                        tiempo=1600;
+                        break;
+                }
                 break;
             case "Fattack":
                 if (war.getWeapon().name.equalsIgnoreCase("Bow")){
                     if (war.getRace().getName().equalsIgnoreCase("Elf")){
                         url=war.getFattack_bow();
-                        tiempo=860;
+                        switch (war.getName()){
+                            case "Epifania":
+                                tiempo=600;
+                                break;
+                            case "Eduardo":
+                                tiempo=600;
+                                break;
+                        }
                     }else{
                         url=war.getFattack();
-                        tiempo=1300;
+                        switch (war.getName()){
+                            case "Maria":
+                                tiempo=1000;
+                                break;
+                            case "Pepe":
+                                tiempo=1000;
+                                break;
+                            case "Torbjina":
+                                tiempo=1000;
+                                break;
+                            case "Torbjorn":
+                                tiempo=1000;
+                                break;
+                        }
                     }
                 }else{
                     url=war.getFattack();
-                    tiempo=1300;
+                    switch (war.getName()){
+                        case "Epifania":
+                            tiempo=1100;
+                            break;
+                        case "Maria":
+                            tiempo=1000;
+                            break;
+                        case "Pepe":
+                            tiempo=1000;
+                            break;
+                        case "Torbjina":
+                            tiempo=1000;
+                            break;
+                        case "Torbjorn":
+                            tiempo=1000;
+                            break;
+                        case "Eduardo":
+                            tiempo=1100;
+                            break;
+                    }
                 }
                 break;
             case "Fdodge":
                 url=war.getFdodge();
-                tiempo=1300;
+                switch (war.getName()){
+                    case "Epifania":
+                        tiempo=1000;
+                        break;
+                    case "Maria":
+                        tiempo=1000;
+                        break;
+                    case "Pepe":
+                        tiempo=1000;
+                        break;
+                    case "Torbjina":
+                        tiempo=1000;
+                        break;
+                    case "Torbjorn":
+                        tiempo=1000;
+                        break;
+                    case "Eduardo":
+                        tiempo=1100;
+                        break;
+                }
                 break;
             case "Fdie":
                 url=war.getFdie();
-                tiempo=2200;
+                switch (war.getName()){
+                    case "Epifania":
+                        tiempo=1950;
+                        break;
+                    case "Maria":
+                        tiempo=2000;
+                        break;
+                    case "Pepe":
+                        tiempo=2200;
+                        break;
+                    case "Torbjina":
+                        tiempo=1500;
+                        break;
+                    case "Torbjorn":
+                        tiempo=1800;
+                        break;
+                    case "Eduardo":
+                        tiempo=4150;
+                        break;
+                }
                 break;
             case "Fcry":
                 url=war.getCry();
@@ -245,9 +449,11 @@ public class PlayPN extends JPanel {
 
         label.setIcon(new ImageIcon(img));
 
+        tiempo= (int) (tiempo*1.2f);
         int finalTiempo = tiempo;
         final Image[] finalImg = {img};
         JLabel finalLabel = label;
+        Warrior finalWar = war;
         new Thread(){
             @Override
             public void run() {
@@ -257,6 +463,8 @@ public class PlayPN extends JPanel {
                     e.printStackTrace();
                 }
                 finalLabel.setIcon(new ImageIcon(backUP));
+
+
             }
         }.start();
 
@@ -281,9 +489,9 @@ public class PlayPN extends JPanel {
                         e.printStackTrace();
                     }
                 }
+
                 /* Loggin things from TextField to TextArea */
                 console.setText("\n"+text+console.getText());
-
 
                 /* Cleaning the TextField  after 1 second of displaying it */
                 try {
@@ -297,8 +505,6 @@ public class PlayPN extends JPanel {
 
     }
 
-
-
     /* Generate a random Warrior */
     public Warrior randomEnemy(){
         Weapons weapons = new Weapons();
@@ -307,7 +513,7 @@ public class PlayPN extends JPanel {
         Warrior war = warriors.getWarriors().get(new Random().nextInt(warriors.getWarriors().size()-1));
 
         /* Save usable weapons for random generated Warrior */
-        for (Weapon w: weapons.weapons){
+        for (Weapon w: weapons.getWeapons()){
             for (Race r:w.getWielders()){
                 if (r.getName().equalsIgnoreCase(war.getRace().getName())){
                     usableWeapons.add(w);
@@ -318,19 +524,17 @@ public class PlayPN extends JPanel {
         /* Randomly selects a weapon */
         war.setWeapon(usableWeapons.get(new Random().nextInt(usableWeapons.size()-1)));
 
-        this.getEnemiImage().setIcon(new ImageIcon(new ImageIcon(war.getFstandLoop()).getImage().getScaledInstance(characterImage.getIcon().getIconWidth()-500,characterImage.getIcon().getIconHeight()-300,Image.SCALE_DEFAULT)));
+        enemiImage.setIcon(new ImageIcon(new ImageIcon(war.getFstandLoop()).getImage().getScaledInstance(characterImage.getIcon().getIconWidth()-500,characterImage.getIcon().getIconHeight()-300,Image.SCALE_DEFAULT)));
+        enemyUser= new User("bot",war);
         return war;
     }
 
 
-    public void gameLoop(){
+    public void gameLoop(){   /* Game Loop */
 
-        healthPlayer.setMaximum(playerUser.warrior.getRace().getHealth());
-        healthPlayer.setValue(playerUser.warrior.getRace().getHealth());
+        int gameSpeed=4000;
 
-        healthEnemy.setMaximum(enemyUser.warrior.getRace().getHealth());
-        healthEnemy.setValue(enemyUser.warrior.getRace().getHealth());
-
+        this.setHealthBars();
 
         ArrayList<User> order;
         int statusAttack;
@@ -341,18 +545,74 @@ public class PlayPN extends JPanel {
         switch (statusAttack){
             case 1:
                 logText(battle.resultAtack(order.get(0),order.get(1)));
-                if (battle.isBot(order.get(0))){
-                    makeAnimation("Fattack");
-                    makeAnimation("Bwound");
-                    healthPlayer.setValue(order.get(1).warrior.getRace().getHealth());
+                if (order.get(1).getWarrior().getRace().getHealth()<=0){
+
+                    try {
+                        gameThread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    logText(order.get(1).getWarrior().getName()+" died :(");
+                    if (battle.isBot(order.get(0))){
+                        makeAnimation("Fattack");
+                        makeAnimation("Bdie");
+
+                        gameSpeed=(int) (tiempo*0.8)-200;
+
+                        playerUser.setPoints(0);
+
+                        healthPlayer.setValue(order.get(1).getWarrior().getRace().getHealth());
+                        if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*25){
+                            healthPlayer.setForeground(Color.RED);
+                        }else if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*75){
+                            healthPlayer.setForeground(Color.YELLOW);
+                        }
+
+
+                    }else{
+                        makeAnimation("Battack");
+                        makeAnimation("Fdie");
+
+                        gameSpeed=(int) (tiempo*0.8)-200;
+
+                        playerUser.setPoints(enemyUser.getPoints()+enemyUser.getWarrior().getWeapon().getPoints()+enemyUser.getWarrior().getRace().getPoints());
+                        healthEnemy.setValue(order.get(1).getWarrior().getRace().getHealth());
+                        if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*25){
+                            healthEnemy.setForeground(Color.RED);
+                        }else if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*75){
+                            healthEnemy.setForeground(Color.YELLOW);
+                        }
+
+
+                    }
+
                 }else{
-                    makeAnimation("Battack");
-                    makeAnimation("Fwound");
-                    healthEnemy.setValue(order.get(1).warrior.getRace().getHealth());
+
+                    if (battle.isBot(order.get(0))){
+                        makeAnimation("Fattack");
+                        makeAnimation("Bwound");
+                        healthPlayer.setValue(order.get(1).getWarrior().getRace().getHealth());
+                        if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*25){
+                            healthPlayer.setForeground(Color.RED);
+                        }else if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*75){
+                            healthPlayer.setForeground(Color.YELLOW);
+                        }
+                    }else{
+                        makeAnimation("Battack");
+                        makeAnimation("Fwound");
+                        healthEnemy.setValue(order.get(1).getWarrior().getRace().getHealth());
+
+                        if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*25){
+                            healthEnemy.setForeground(Color.RED);
+                        }else if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*75){
+                            healthEnemy.setForeground(Color.YELLOW);
+                        }
+                    }
                 }
                 break;
             case 2:
-                logText(order.get(0).getName()+" miss");
+                logText(order.get(0).getWarrior().getName()+" misses");
                 if (battle.isBot(order.get(0))){
                     makeAnimation("Fattack");
                 }else{
@@ -360,7 +620,7 @@ public class PlayPN extends JPanel {
                 }
                 break;
             case 3:
-                logText(order.get(1).getName()+" dodges "+order.get(0).getName()+"'s attack");
+                logText(order.get(1).getWarrior().getName()+" dodges "+order.get(0).getWarrior().getName()+"'s attack");
                 if (battle.isBot(order.get(0))){
                     makeAnimation("Fattack");
                     makeAnimation("Bdodge");
@@ -370,84 +630,141 @@ public class PlayPN extends JPanel {
                 }
                 break;
         }
-
         try {
-            Thread.sleep(4000);
+            Thread.sleep(gameSpeed);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        if (playerUser.getWarrior().getRace().getHealth()>0 && enemyUser.getWarrior().getRace().getHealth()>0){
+            do{
 
-        do{
+                order=battle.order(order.get(0),order.get(1));
+                statusAttack=battle.attack(order.get(0),order.get(1));
 
-            order=battle.order(order.get(0),order.get(1));
-            statusAttack=battle.attack(order.get(0),order.get(1));
+                switch (statusAttack){
+                    case 1:
+                        logText(battle.resultAtack(order.get(0),order.get(1)));
+                        if (order.get(1).getWarrior().getRace().getHealth()<=0){
 
-            switch (statusAttack){
-                case 1:
-                    logText(battle.resultAtack(order.get(0),order.get(1)));
-                    if (order.get(1).warrior.getRace().getHealth()<=0){
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            try {
+                                gameThread.sleep(3000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+                            logText(order.get(1).getWarrior().getName()+" died :(");
+                            if (battle.isBot(order.get(0))){
+                                makeAnimation("Fattack");
+                                makeAnimation("Bdie");
+
+                                gameSpeed=(int) (tiempo*0.8)-200;
+                                playerUser.setPoints(0);
+
+                                healthPlayer.setValue(order.get(1).getWarrior().getRace().getHealth());
+                                if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*25){
+                                    healthPlayer.setForeground(Color.RED);
+                                }else if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*75){
+                                    healthPlayer.setForeground(Color.YELLOW);
+                                }
+
+
+                            }else{
+                                makeAnimation("Battack");
+                                makeAnimation("Fdie");
+
+                                gameSpeed=(int) (tiempo*0.8)-200;
+
+                                playerUser.setPoints(enemyUser.getPoints()+enemyUser.getWarrior().getWeapon().getPoints()+enemyUser.getWarrior().getRace().getPoints());
+                                healthEnemy.setValue(order.get(1).getWarrior().getRace().getHealth());
+                                if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*25){
+                                    healthEnemy.setForeground(Color.RED);
+                                }else if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*75){
+                                    healthEnemy.setForeground(Color.YELLOW);
+                                }
+
+
+                            }
+
+                        }else{
+
+                            if (battle.isBot(order.get(0))){
+                                makeAnimation("Fattack");
+                                makeAnimation("Bwound");
+                                healthPlayer.setValue(order.get(1).getWarrior().getRace().getHealth());
+                                if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*25){
+                                    healthPlayer.setForeground(Color.RED);
+                                }else if (healthPlayer.getValue()<((float)healthPlayer.getMaximum()/100)*75){
+                                    healthPlayer.setForeground(Color.YELLOW);
+                                }
+                            }else{
+                                makeAnimation("Battack");
+                                makeAnimation("Fwound");
+                                healthEnemy.setValue(order.get(1).getWarrior().getRace().getHealth());
+
+                                if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*25){
+                                    healthEnemy.setForeground(Color.RED);
+                                }else if (healthEnemy.getValue()<((float)healthEnemy.getMaximum()/100)*75){
+                                    healthEnemy.setForeground(Color.YELLOW);
+                                }
+                            }
                         }
-                        logText(order.get(1).warrior.getName()+" a muerto :(");
+                        break;
+                    case 2:
+                        logText(order.get(0).getWarrior().getName()+" misses");
                         if (battle.isBot(order.get(0))){
                             makeAnimation("Fattack");
-                            makeAnimation("Bdie");
-                            healthPlayer.setValue(order.get(1).warrior.getRace().getHealth());
                         }else{
                             makeAnimation("Battack");
-                            makeAnimation("Fdie");
-                            healthEnemy.setValue(order.get(1).warrior.getRace().getHealth());
                         }
-
-                    }else{
-
+                        break;
+                    case 3:
+                        logText(order.get(1).getWarrior().getName()+" dodges "+order.get(0).getWarrior().getName()+"'s attack");
                         if (battle.isBot(order.get(0))){
                             makeAnimation("Fattack");
-                            makeAnimation("Bwound");
-                            healthPlayer.setValue(order.get(1).warrior.getRace().getHealth());
+                            makeAnimation("Bdodge");
                         }else{
                             makeAnimation("Battack");
-                            makeAnimation("Fwound");
-                            healthEnemy.setValue(order.get(1).warrior.getRace().getHealth());
+                            makeAnimation("Fdodge");
                         }
-                    }
-                    break;
-                case 2:
-                    logText(order.get(0).getName()+" miss");
-                    if (battle.isBot(order.get(0))){
-                        makeAnimation("Fattack");
-                    }else{
-                        makeAnimation("Battack");
-                    }
-                    break;
-                case 3:
-                    logText(order.get(1).getName()+" dodges "+order.get(1).getName()+"'s attack");
-                    if (battle.isBot(order.get(0))){
-                        makeAnimation("Fattack");
-                        makeAnimation("Bdodge");
-                    }else{
-                        makeAnimation("Battack");
-                        makeAnimation("Fdodge");
-                    }
-                    break;
-            }
+                        break;
+                }
 
-            try {
-                Thread.sleep(4000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                try {
+                    Thread.sleep(gameSpeed);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-        }while(playerUser.warrior.getRace().getHealth()>0 && enemyUser.warrior.getRace().getHealth()>0);
+            }while(playerUser.getWarrior().getRace().getHealth()>0 && enemyUser.getWarrior().getRace().getHealth()>0);
+        }
+        framePrincipal.getMySqlCon().uploadBattle(framePrincipal.getMySqlCon().uploadUser());
+        playerUser.setPoints(0);
+
+        Main.musica("Ranking");
 
         /* Displays Winner panel */
         framePrincipal.getCards().add(new WinnerPN(),"Winner");
         CardLayout cl = (CardLayout) framePrincipal.getCards().getLayout();
         cl.show(framePrincipal.getCards(),"Winner");
 
+    }
+
+    public void setHealthBars(){  /* Sets the Health Bars */
+
+        characterWeapon.setIcon(new ImageIcon(new ImageIcon(playerUser.getWarrior().getWeapon().getImage()).getImage().getScaledInstance(100,100,Image.SCALE_DEFAULT)));
+        healthPlayer.setMaximum(playerUser.getWarrior().getRace().getHealth());
+        healthPlayer.setValue(playerUser.getWarrior().getRace().getHealth());
+        healthPlayer.setForeground(Color.GREEN);
+
+        enemiWeapon.setIcon(new ImageIcon(new ImageIcon(enemyUser.getWarrior().getWeapon().getImage()).getImage().getScaledInstance(100,100,Image.SCALE_DEFAULT)));
+        healthEnemy.setMaximum(enemyUser.getWarrior().getRace().getHealth());
+        healthEnemy.setValue(enemyUser.getWarrior().getRace().getHealth());
+        healthEnemy.setForeground(Color.GREEN);
+
+    }
+
+    public JTextArea getConsole() {
+        return console;
     }
 
     public User getPlayerUser() {
@@ -462,12 +779,20 @@ public class PlayPN extends JPanel {
         this.playerWarrior = playerWarrior;
     }
 
+    public void setEnemyWarrior(Warrior enemyWarrior) {
+        this.enemyWarrior = enemyWarrior;
+    }
+
     public void setPlayerUser(User playerUser) {
         this.playerUser = playerUser;
     }
 
     public void setEnemyUser(User enemyUser) {
         this.enemyUser = enemyUser;
+    }
+
+    public void setImgBackground() {
+        this.imgBackground = new ImageIcon("./media/map"+enemyWarrior.getRace().getName()+".png").getImage().getScaledInstance(this.getWidth(),this.getHeight(),Image.SCALE_SMOOTH);
     }
 
     public Warrior getPlayerWarrior() {
@@ -486,6 +811,9 @@ public class PlayPN extends JPanel {
         return enemiImage;
     }
 
+    public JButton getFigthBT() {
+        return figthBT;
+    }
 
     @Override
     protected void paintComponent(Graphics g) {

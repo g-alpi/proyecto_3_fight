@@ -5,11 +5,20 @@ public class Battle {
 
     public ArrayList<User> firstOrder(User u1,User u2){  //orders the users by speed
         ArrayList<User> order= new ArrayList<User>();
+        u1.setInjuriesCaused(0);
+        u1.setInjuriesSuffered(0);  //resets injuries so when you play more than one time they dont add up (firstorder just happens at the start of the fight)
+        u2.setInjuriesCaused(0);
+        u2.setInjuriesSuffered(0);
+        if (u1.getName().equalsIgnoreCase("hero")){  //checking for cheatcodes
+            u1.getWarrior().getRace().strenght=9999;
+        }else if (u1.getName().equalsIgnoreCase("villain")){
+            u2.getWarrior().getRace().strenght=9999;
+        }
 
-        if (u1.warrior.getTrueSpeed()>u2.warrior.getTrueSpeed()){
+        if (u1.getWarrior().getTrueSpeed()>u2.getWarrior().getTrueSpeed()){
             order.add(u1);
             order.add(u2);
-            return order;
+            return order;   //returns the one that will attack on position 0 and the defender on position 1
         }
         order.add(u2);
         order.add(u1);
@@ -20,9 +29,9 @@ public class Battle {
         int Str_a;
         int Sp_a;
         int rand=new Random().nextInt(101);
-        if (attacker.warrior.getRace().getAgility()*10>rand){ //if the agility of the attacker*10 doesnt surpass the random number the atack fails
+        if (attacker.getWarrior().getRace().getAgility()*10>rand){ //if the agility of the attacker*10 doesnt surpass the random number the atack fails
             rand=new Random().nextInt(51);
-            if (defender.warrior.getRace().getAgility()>rand){ //if the agility of the defender surpases the random number he dodges the attack
+            if (defender.getWarrior().getRace().getAgility()>rand){ //if the agility of the defender surpases the random number he dodges the attack
                 return 3; // 3 dodged attack
             }
         }
@@ -33,25 +42,25 @@ public class Battle {
     }
 
     public String resultAtack(User attacker, User defender){ //calculates the damage and returns the string that will be shown
-        int dmg=attacker.warrior.getTrueStrength()-defender.warrior.race.getDefence();
-        defender.warrior.getRace().setHealth(defender.warrior.getRace().getHealth()-dmg);
-        return attacker.warrior.getName()+" attacks "+defender.warrior.getName()+" dealing "+dmg+" damage";
+        int dmg=attacker.getWarrior().getTrueStrength()-defender.getWarrior().getRace().getDefence();
+        attacker.setInjuriesCaused(attacker.getInjuriesCaused()+dmg); //adds the injuries caused and suffered to the players
+        defender.setInjuriesSuffered(defender.getInjuriesSuffered()+dmg);
+        defender.getWarrior().getRace().setHealth(defender.getWarrior().getRace().getHealth()-dmg);
+        return attacker.getWarrior().getName()+" attacks "+defender.getWarrior().getName()+" dealing "+dmg+" damage";
     }
 
     public ArrayList<User> order(User attacker, User defender){ //reorders the users for the next turn
         ArrayList<User> order = new ArrayList<>();
-        if (attacker.warrior.getTrueSpeed()<defender.warrior.getTrueSpeed()){
+        if (attacker.getWarrior().getTrueSpeed()<defender.getWarrior().getTrueSpeed()){
             order.add(defender);
             order.add(attacker);
             return order;
         }
         int rand=new Random().nextInt(101);
-        if ((attacker.warrior.getTrueSpeed()-defender.warrior.getTrueSpeed())*10>rand){
+        if ((attacker.getWarrior().getTrueSpeed()-defender.getWarrior().getTrueSpeed())*10>rand){
             order.add(attacker);
-            System.out.println(attacker.getName());
             order.add(defender);
-            System.out.println(defender.getName());
-            return order;
+            return order;       //returns the one that will attack on position 0 and the defender on position 1
         }
         order.add(defender);
         order.add(attacker);
@@ -60,7 +69,7 @@ public class Battle {
 
     public boolean isBot(User user){
 
-        if (user.name.equalsIgnoreCase("bot")){
+        if (user.getName().equalsIgnoreCase("bot")){
             return true;
         }else{
             return false;

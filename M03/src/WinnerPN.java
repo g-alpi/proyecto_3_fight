@@ -2,16 +2,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class WinnerPN extends JPanel {
-    User winner;
-    User loser;
-    Image backgroundImg;
-    Font font;
+    private User winner;
+    private User loser;
+    private Image backgroundImg;
+    private Font font;
     public WinnerPN(){
 
         try{
@@ -36,7 +38,7 @@ public class WinnerPN extends JPanel {
         User player=framePrincipal.getPlayPN().getPlayerUser();
         User enemy=framePrincipal.getPlayPN().getEnemyUser();
 
-        if (player.warrior.race.getHealth()==0){
+        if (player.getWarrior().getRace().getHealth()<=0){
             winner=enemy;
             loser=player;
         } else{
@@ -47,7 +49,7 @@ public class WinnerPN extends JPanel {
         JPanel textPN = new JPanel();
         textPN.setLayout(new GridLayout(3,0));
 
-        String wins = winner.warrior.getName()+" wins";
+        String wins = winner.getWarrior().getName()+" wins";
         wins=wins.toLowerCase(Locale.ROOT);
         JLabel text = new JLabel(wins);
         text.setHorizontalAlignment(SwingConstants.CENTER);
@@ -70,8 +72,8 @@ public class WinnerPN extends JPanel {
         blank.setOpaque(false);
         warriors.add(blank);
 
-        ImageIcon winnerGif = new ImageIcon("./warriors/dance_"+winner.warrior.getName()+".gif");
-        ImageIcon loserGif = new ImageIcon("./warriors/cry_"+loser.warrior.getName()+".gif");
+        ImageIcon winnerGif = new ImageIcon("./warriors/dance_"+winner.getWarrior().getName()+".gif");
+        ImageIcon loserGif = new ImageIcon("./warriors/cry_"+loser.getWarrior().getName()+".gif");
 
         JLabel winL = new JLabel(winnerGif);
         warriors.add(winL);
@@ -86,8 +88,8 @@ public class WinnerPN extends JPanel {
 
         JPanel buttons = new JPanel();
 
-        JButton goAgain = new JButton("go Again");
-        JButton rank=new JButton("Ranking");
+        JButton goAgain = new JButton();
+        JButton rank=new JButton();
 
         buttons.add(goAgain);
         buttons.add(rank);
@@ -99,32 +101,106 @@ public class WinnerPN extends JPanel {
 
         warriors.setOpaque(false);
 
+
+
+        goAgain.setIcon(new ImageIcon("./media/button_replay.png"));
+        goAgain.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        goAgain.setIcon(new ImageIcon("./media/button_replay-hover.png"));
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        goAgain.setIcon(new ImageIcon("./media/button_replay.png"));
+                    }
+                }
+        );
+
+        goAgain.setBorder(null);
+        goAgain.setContentAreaFilled(false);
         goAgain.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        PlayPN playPanel= (PlayPN) framePrincipal.getCards().getComponents()[1];
+                        PlayPN playPanel= framePrincipal.getPlayPN();
                         /* Change panel to figth */
                         CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
                         cl.show(framePrincipal.getCards(), "PeleaPanel");
 
+
+                        /* Reset enemy warrior */
+                        playPanel.setEnemyWarrior(playPanel.randomEnemy());
+                        while (playPanel.getPlayerWarrior().getName().equalsIgnoreCase(playPanel.getEnemyWarrior().getName())){
+                            playPanel.setEnemyWarrior(playPanel.randomEnemy());
+                        }
+
+
+
+                        /* Clean the console */
+                        playPanel.getConsole().setText("");
+
+                        /* Reset player health */
+                        switch (playPanel.getPlayerUser().getWarrior().getRace().getName()){
+                            case "human":
+                                playPanel.getPlayerUser().getWarrior().setRace(framePrincipal.getMySqlCon().getHuman());
+                                break;
+                            case "dwarf":
+                                playPanel.getPlayerUser().getWarrior().setRace(framePrincipal.getMySqlCon().getDwarf());
+                                break;
+                            case "elf":
+                                playPanel.getPlayerUser().getWarrior().setRace(framePrincipal.getMySqlCon().getElf());
+                                break;
+                        }
+
+                        playPanel.getCharacterImage().setIcon(new ImageIcon(playPanel.getPlayerUser().getWarrior().getBstandLoop()));
+
+                        /* Reset health bars */
+                        playPanel.setHealthBars();
+
+                        playPanel.getFigthBT().setVisible(true);
+
+                        playPanel.setImgBackground();
+
                         /* Set music for new panel */
-                        Main.musica("ChangeCharacter");
-                    }
-                }
-        );
-        rank.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        PlayPN playPanel= (PlayPN) framePrincipal.getCards().getComponents()[1];
-                        /* Change panel to figth */
-                        CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
-                        cl.show(framePrincipal.getCards(), "RankPN");
+                        Main.musica("Figth");
                     }
                 }
         );
 
+
+
+        rank.setIcon(new ImageIcon("./media/button_ranking.png"));
+
+        rank.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        rank.setIcon(new ImageIcon("./media/button_ranking-hover.png"));
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        rank.setIcon(new ImageIcon("./media/button_ranking.png"));
+                    }
+                }
+        );
+
+        rank.setBorder(null);
+        rank.setContentAreaFilled(false);
+        rank.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        framePrincipal.newRankPN();
+                        PlayPN playPanel= (PlayPN) framePrincipal.getCards().getComponents()[1];
+                        /* Change panel to figth */
+                        CardLayout cl = (CardLayout) (framePrincipal.getCards().getLayout());
+                        cl.show(framePrincipal.getCards(), "Ranking");
+                    }
+                }
+        );
         this.setVisible(true);
     }
     @Override

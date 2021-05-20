@@ -9,6 +9,7 @@ public class Hilo extends Thread{
 
     @Override
     public void run() {
+        /* Creates a new Frame, Iniciating the game */
         new Frame();
     }
 }
