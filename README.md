@@ -2,6 +2,10 @@ Wow Fights es un juego, donde eliges personaje, arma y te dispones a luchar cont
 
 La lucha consiste en un combate por turnos donde el jugador tiene la posibilidad de asestar un golpe y el enemigo de esquivarlo. El usuario no tiene que interaccionar en ella, solo tiene que deleitarse y disfrutar de tal nivel de gameplay.
 
+Requisitos minimos:
+  ·200 MB espacio libre en el disco
+  ·500 MB de RAM
+
 Para poder ejecutar el videojuego necesitamos:
 -Base de datos:
   ·Ejecutar el script (En nuestro caso en MySQL Workbench)
